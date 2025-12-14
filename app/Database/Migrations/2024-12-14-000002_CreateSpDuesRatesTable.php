@@ -22,7 +22,6 @@ class CreateSpDuesRatesTable extends Migration
             'rate_code' => [
                 'type' => 'VARCHAR',
                 'constraint' => 20,
-                'unique' => true,
             ],
             'rate_name' => [
                 'type' => 'VARCHAR',
@@ -52,6 +51,7 @@ class CreateSpDuesRatesTable extends Migration
         ]);
 
         $this->forge->addKey('id', true);
+        $this->forge->addUniqueKey('rate_code');
         $this->forge->addKey('rate_type');
         $this->forge->createTable('sp_dues_rates');
     }
