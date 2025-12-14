@@ -55,14 +55,35 @@ $routes->group('', ['filter' => 'auth', 'namespace' => 'App\Controllers'], funct
 // Admin Routes - Require super_admin or admin role
 $routes->group('admin', ['filter' => 'rbac:super_admin,admin', 'namespace' => 'App\Controllers\Admin'], function($routes) {
     $routes->get('dashboard', 'Dashboard::index');
-    // More admin routes will be added later
+
+    // Member Management
+    $routes->get('members', 'MemberManagement::index');
+    $routes->get('members/pending', 'MemberManagement::pendingApprovals');
+    $routes->get('members/view/(:num)', 'MemberManagement::view/$1');
+    $routes->post('members/approve/(:num)', 'MemberManagement::approve/$1');
+    $routes->post('members/reject/(:num)', 'MemberManagement::reject/$1');
+    $routes->post('members/suspend/(:num)', 'MemberManagement::suspend/$1');
+    $routes->post('members/activate/(:num)', 'MemberManagement::activate/$1');
+    $routes->post('members/delete/(:num)', 'MemberManagement::delete/$1');
+
+    // Payment Management
+    $routes->get('payments', 'PaymentManagement::index');
+    $routes->get('payments/pending', 'PaymentManagement::pendingVerifications');
+    $routes->get('payments/view/(:num)', 'PaymentManagement::view/$1');
+    $routes->post('payments/verify/(:num)', 'PaymentManagement::verify/$1');
+    $routes->post('payments/reject/(:num)', 'PaymentManagement::reject/$1');
 });
 
 // Member Routes - Require member, coordinator, or treasurer role
 $routes->group('member', ['filter' => 'rbac:member,coordinator,treasurer', 'namespace' => 'App\Controllers\Member'], function($routes) {
     $routes->get('dashboard', 'Dashboard::index');
     $routes->get('profile', 'Profile::index');
-    // More member routes will be added later
+
+    // Payment/Dues
+    $routes->get('payment', 'Payment::index');
+    $routes->get('payment/submit', 'Payment::submit');
+    $routes->post('payment/submit', 'Payment::processSubmit');
+    $routes->get('payment/view/(:num)', 'Payment::view/$1');
 });
 
 // Candidate Routes - For registration completion
