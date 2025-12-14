@@ -78,7 +78,11 @@
             <button class="th-menu-toggle"><i class="fal fa-times"></i></button>
             <div class="mobile-logo">
                 <a href="<?= base_url('/') ?>">
+<<<<<<< HEAD
                     <img src="<?= base_url('assets/img/logo/logo.svg') ?>" alt="SPK">
+=======
+                    <img src="<?= base_url('assets/img/logo.png') ?>" alt="SPK">
+>>>>>>> main
                 </a>
             </div>
             <div class="th-mobile-menu">
@@ -117,7 +121,7 @@
                         <div class="header-links">
                             <ul>
                                 <li><i class="far fa-phone"></i><a href="tel:<?= esc($contact_phone ?? '+62123456789') ?>"><?= esc($contact_phone ?? '+62 123 456 789') ?></a></li>
-                                <li class="d-none d-xl-inline-block"><i class="far fa-envelope"></i><a href="mailto:<?= esc($contact_email ?? 'info@spk.local') ?>"><?= esc($contact_email ?? 'info@spk.local') ?></a></li>
+                                <li class="d-none d-xl-inline-block"><i class="far fa-envelope"></i><a href="mailto:<?= esc($contact_email ?? 'sekretariat@spk.or.id') ?>"><?= esc($contact_email ?? 'sekretariat@spk.or.id') ?></a></li>
                                 <li><i class="far fa-clock"></i>Senin - Jumat: 08:00 - 16:00</li>
                             </ul>
                         </div>
@@ -142,14 +146,17 @@
             </div>
         </div>
         <div class="sticky-wrapper">
-            <!-- Main Menu Area -->
             <div class="menu-area">
                 <div class="container">
                     <div class="row align-items-center justify-content-between">
                         <div class="col-auto">
                             <div class="header-logo">
                                 <a href="<?= base_url('/') ?>">
+<<<<<<< HEAD
                                     <img src="<?= base_url('assets/img/logo/logo.svg') ?>" alt="SPK">
+=======
+                                    <img src="<?= base_url('assets/img/logo.png') ?>" alt="SPK" style="max-width: 220px; height: auto;">
+>>>>>>> main
                                 </a>
                             </div>
                         </div>
