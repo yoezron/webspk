@@ -18,20 +18,17 @@ class CreateSpMembersTable extends Migration
             'uuid' => [
                 'type' => 'VARCHAR',
                 'constraint' => 36,
-                'unique' => true,
             ],
             'member_number' => [
                 'type' => 'VARCHAR',
                 'constraint' => 50,
                 'null' => true,
-                'unique' => true,
             ],
 
             // Authentication
             'email' => [
                 'type' => 'VARCHAR',
                 'constraint' => 255,
-                'unique' => true,
             ],
             'password_hash' => [
                 'type' => 'VARCHAR',
@@ -452,9 +449,9 @@ class CreateSpMembersTable extends Migration
         ]);
 
         $this->forge->addKey('id', true);
-        $this->forge->addKey('uuid');
-        $this->forge->addKey('email');
-        $this->forge->addKey('member_number');
+        $this->forge->addUniqueKey('uuid');
+        $this->forge->addUniqueKey('email');
+        $this->forge->addUniqueKey('member_number');
         $this->forge->addKey('membership_status');
         $this->forge->addKey('account_status');
         $this->forge->createTable('sp_members');
