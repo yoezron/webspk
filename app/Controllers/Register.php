@@ -11,7 +11,7 @@ class Register extends BaseController
     public function __construct()
     {
         $this->memberModel = new MemberModel();
-        helper(['form', 'url']);
+        helper(['form', 'url', 'upload', 'app']);
     }
 
     /**
@@ -301,20 +301,94 @@ class Register extends BaseController
             return redirect()->to(base_url('registrasi'))->with('error', 'Silakan lengkapi langkah sebelumnya');
         }
 
-        // Handle file uploads (will be implemented with proper file upload handling)
-        // For now, just mark as completed
+        // Validate agreements
+        if (!$this->request->getPost('agreement_accepted') || !$this->request->getPost('privacy_accepted')) {
+            return redirect()->back()->withInput()->with('error', 'Anda harus menyetujui AD/ART dan Kebijakan Privasi');
+        }
 
         $memberId = session()->get('registration_member_id');
-
         $updateData = [
-            'onboarding_state' => 'payment_submitted',
-            'registration_payment_date' => date('Y-m-d H:i:s'),
+            'agreement_accepted_at' => date('Y-m-d H:i:s'),
+            'privacy_accepted_at' => date('Y-m-d H:i:s'),
         ];
 
+        $uploadErrors = [];
+
+        // Upload payment proof (required)
+        $paymentProof = $this->request->getFile('registration_payment_proof');
+        if ($paymentProof && $paymentProof->isValid()) {
+            $result = upload_file($paymentProof, 'uploads/payments/', ['jpg', 'jpeg', 'png', 'pdf'], 2048);
+            if ($result['success']) {
+                $updateData['registration_payment_proof'] = $result['file_name'];
+                $updateData['registration_payment_date'] = date('Y-m-d H:i:s');
+            } else {
+                $uploadErrors[] = 'Bukti Pembayaran: ' . $result['error'];
+            }
+        } else {
+            $uploadErrors[] = 'Bukti Pembayaran: File wajib diupload';
+        }
+
+        // Upload ID card (required)
+        $idCard = $this->request->getFile('id_card_photo');
+        if ($idCard && $idCard->isValid()) {
+            $result = upload_file($idCard, 'uploads/documents/', ['jpg', 'jpeg', 'png', 'pdf'], 2048);
+            if ($result['success']) {
+                $updateData['id_card_photo'] = $result['file_name'];
+            } else {
+                $uploadErrors[] = 'KTP: ' . $result['error'];
+            }
+        } else {
+            $uploadErrors[] = 'KTP: File wajib diupload';
+        }
+
+        // Upload family card (optional)
+        $familyCard = $this->request->getFile('family_card_photo');
+        if ($familyCard && $familyCard->isValid()) {
+            $result = upload_file($familyCard, 'uploads/documents/', ['jpg', 'jpeg', 'png', 'pdf'], 2048);
+            if ($result['success']) {
+                $updateData['family_card_photo'] = $result['file_name'];
+            } else {
+                $uploadErrors[] = 'Kartu Keluarga: ' . $result['error'];
+            }
+        }
+
+        // Upload SK Pengangkatan (optional)
+        $skPengangkatan = $this->request->getFile('sk_pengangkatan_photo');
+        if ($skPengangkatan && $skPengangkatan->isValid()) {
+            $result = upload_file($skPengangkatan, 'uploads/documents/', ['jpg', 'jpeg', 'png', 'pdf'], 2048);
+            if ($result['success']) {
+                $updateData['sk_pengangkatan_photo'] = $result['file_name'];
+            } else {
+                $uploadErrors[] = 'SK Pengangkatan: ' . $result['error'];
+            }
+        }
+
+        // Upload profile photo (optional)
+        $profilePhoto = $this->request->getFile('profile_photo');
+        if ($profilePhoto && $profilePhoto->isValid()) {
+            $result = upload_file($profilePhoto, 'uploads/photos/', ['jpg', 'jpeg', 'png'], 2048);
+            if ($result['success']) {
+                $updateData['profile_photo'] = $result['file_name'];
+            } else {
+                $uploadErrors[] = 'Pas Foto: ' . $result['error'];
+            }
+        }
+
+        // If there are upload errors, return with error messages
+        if (!empty($uploadErrors)) {
+            return redirect()->back()->withInput()->with('error', 'Gagal upload file:<br>' . implode('<br>', $uploadErrors));
+        }
+
+        // Update onboarding state
+        $updateData['onboarding_state'] = 'payment_submitted';
+
+        // Update member data
         $this->memberModel->update($memberId, $updateData);
 
         // Clear registration session
         session()->remove(['registration_member_id', 'registration_member_uuid', 'registration_step']);
+
+        // TODO: Send email verification here
 
         return redirect()->to(base_url('registrasi/selesai'))->with('success', 'Pendaftaran berhasil diselesaikan');
     }
