@@ -3,14 +3,17 @@
 namespace App\Controllers;
 
 use App\Models\MemberModel;
+use App\Libraries\EmailService;
 
 class Register extends BaseController
 {
     protected $memberModel;
+    protected $emailService;
 
     public function __construct()
     {
         $this->memberModel = new MemberModel();
+        $this->emailService = new EmailService();
         helper(['form', 'url', 'upload', 'app']);
     }
 
@@ -121,14 +124,37 @@ class Register extends BaseController
         // Get created member
         $member = $this->memberModel->find($memberId);
 
+        // Generate verification token
+        $token = bin2hex(random_bytes(32));
+        $tokenHash = hash('sha256', $token);
+
+        $expiryHours = getenv('app.emailVerificationExpiry') ?: 24;
+
+        // Save token to database
+        $this->memberModel->update($memberId, [
+            'reset_token_hash' => $tokenHash,
+            'reset_token_expires_at' => date('Y-m-d H:i:s', strtotime("+{$expiryHours} hours")),
+        ]);
+
+        // Send verification email
+        $emailSent = $this->emailService->sendEmailVerification(
+            $member['email'],
+            $member['full_name'],
+            $token
+        );
+
+        if (!$emailSent) {
+            log_message('error', 'Failed to send verification email to: ' . $member['email']);
+        }
+
         // Set session for continuation
         session()->set([
             'registration_member_id' => $memberId,
             'registration_member_uuid' => $member['uuid'],
-            'registration_step' => 2,
+            'registration_step' => 1, // Keep at step 1 until email verified
         ]);
 
-        return redirect()->to(base_url('registrasi/step-2'))->with('success', 'Akun berhasil dibuat. Silakan lengkapi data diri Anda');
+        return redirect()->to(base_url('registrasi/verifikasi-email'))->with('success', 'Akun berhasil dibuat. Silakan cek email Anda untuk verifikasi.');
     }
 
     /**
@@ -391,6 +417,27 @@ class Register extends BaseController
         // TODO: Send email verification here
 
         return redirect()->to(base_url('registrasi/selesai'))->with('success', 'Pendaftaran berhasil diselesaikan');
+    }
+
+    /**
+     * Email verification page
+     */
+    public function verificationEmail()
+    {
+        if (!session()->has('registration_member_id')) {
+            return redirect()->to(base_url('registrasi'))->with('error', 'Silakan mulai dari langkah pertama');
+        }
+
+        $memberId = session()->get('registration_member_id');
+        $member = $this->memberModel->find($memberId);
+
+        $data = [
+            'title' => 'Verifikasi Email',
+            'description' => 'Silakan verifikasi email Anda',
+            'email' => $member['email'] ?? '',
+        ];
+
+        return view('auth/email_verification_sent', $data);
     }
 
     /**
