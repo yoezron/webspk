@@ -17,7 +17,11 @@
     <meta name="<?= csrf_token() ?>" content="<?= csrf_hash() ?>">
 
     <!-- Favicons -->
-    <link rel="icon" type="image/x-icon" href="<?= base_url('favicon.ico') ?>">
+    <link rel="icon" type="image/png" href="<?= base_url('assets/img/logo/favicon.png') ?>">
+    <link rel="apple-touch-icon" sizes="180x180" href="<?= base_url('assets/img/favicons/apple-icon-180x180.png') ?>">
+    <link rel="icon" type="image/png" sizes="192x192" href="<?= base_url('assets/img/favicons/android-icon-192x192.png') ?>">
+    <link rel="icon" type="image/png" sizes="32x32" href="<?= base_url('assets/img/logo/favicon.png') ?>">
+    <link rel="icon" type="image/png" sizes="16x16" href="<?= base_url('assets/img/logo/favicon.png') ?>">
 
     <!--==============================
 	  Google Fonts
@@ -74,7 +78,7 @@
             <button class="th-menu-toggle"><i class="fal fa-times"></i></button>
             <div class="mobile-logo">
                 <a href="<?= base_url('/') ?>">
-                    <img src="<?= base_url('assets/img/logo.svg') ?>" alt="SPK">
+                    <img src="<?= base_url('assets/img/logo/logo.svg') ?>" alt="SPK">
                 </a>
             </div>
             <div class="th-mobile-menu">
@@ -145,7 +149,7 @@
                         <div class="col-auto">
                             <div class="header-logo">
                                 <a href="<?= base_url('/') ?>">
-                                    <img src="<?= base_url('assets/img/logo.svg') ?>" alt="SPK">
+                                    <img src="<?= base_url('assets/img/logo/logo.svg') ?>" alt="SPK">
                                 </a>
                             </div>
                         </div>
