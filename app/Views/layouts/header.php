@@ -78,11 +78,7 @@
             <button class="th-menu-toggle"><i class="fal fa-times"></i></button>
             <div class="mobile-logo">
                 <a href="<?= base_url('/') ?>">
-<<<<<<< HEAD
                     <img src="<?= base_url('assets/img/logo/logo.svg') ?>" alt="SPK">
-=======
-                    <img src="<?= base_url('assets/img/logo.png') ?>" alt="SPK">
->>>>>>> main
                 </a>
             </div>
             <div class="th-mobile-menu">
@@ -152,11 +148,7 @@
                         <div class="col-auto">
                             <div class="header-logo">
                                 <a href="<?= base_url('/') ?>">
-<<<<<<< HEAD
-                                    <img src="<?= base_url('assets/img/logo/logo.svg') ?>" alt="SPK">
-=======
-                                    <img src="<?= base_url('assets/img/logo.png') ?>" alt="SPK" style="max-width: 220px; height: auto;">
->>>>>>> main
+                                    <img src="<?= base_url('assets/img/logo/logo.svg') ?>" alt="SPK" style="max-width: 220px; height: auto;">
                                 </a>
                             </div>
                         </div>
