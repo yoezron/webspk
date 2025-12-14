@@ -22,7 +22,6 @@ class CreateSpRegionCodesTable extends Migration
             'region_code' => [
                 'type' => 'VARCHAR',
                 'constraint' => 10,
-                'unique' => true,
             ],
             'description' => [
                 'type' => 'TEXT',
@@ -44,7 +43,7 @@ class CreateSpRegionCodesTable extends Migration
         ]);
 
         $this->forge->addKey('id', true);
-        $this->forge->addKey('region_code');
+        $this->forge->addUniqueKey('region_code');
         $this->forge->createTable('sp_region_codes');
     }
 
