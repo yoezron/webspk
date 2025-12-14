@@ -8,6 +8,19 @@ use CodeIgniter\Router\RouteCollection;
 // Public Routes
 $routes->get('/', 'Home::index');
 
+// Registration Routes (Public - Multi-step)
+$routes->group('registrasi', ['namespace' => 'App\Controllers'], function($routes) {
+    $routes->get('/', 'Register::index');
+    $routes->post('step-1', 'Register::processStep1');
+    $routes->get('step-2', 'Register::step2');
+    $routes->post('step-2', 'Register::processStep2');
+    $routes->get('step-3', 'Register::step3');
+    $routes->post('step-3', 'Register::processStep3');
+    $routes->get('step-4', 'Register::step4');
+    $routes->post('step-4', 'Register::processStep4');
+    $routes->get('selesai', 'Register::complete');
+});
+
 // Authentication Routes
 $routes->group('', ['namespace' => 'App\Controllers'], function($routes) {
     // Login
