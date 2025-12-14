@@ -52,7 +52,7 @@
                                 <div class="th-widget-about">
                                     <div class="about-logo">
                                         <a href="<?= base_url('/') ?>">
-                                            <img src="<?= base_url('assets/img/logo/logo-white.svg') ?>" alt="SPK">
+                                            <img src="<?= base_url('assets/img/logo/logo.png') ?>" alt="SPK">
                                         </a>
                                     </div>
                                     <p class="about-text">Serikat Pekerja Kampus adalah organisasi yang memperjuangkan hak dan kesejahteraan para pekerja di lingkungan kampus.</p>
@@ -173,6 +173,6 @@
         });
     </script>
 
-</body>
+    </body>
 
-</html>
+    </html>
