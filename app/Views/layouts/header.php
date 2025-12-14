@@ -64,7 +64,7 @@
      Preloader
     ==============================-->
     <div class="preloader">
-        <button class="th-btn style3 preloaderCls">Batalkan Preloader</button>
+        <button class="th-btn style3 preloaderCls">Mohon Menunggu</button>
         <div class="preloader-inner">
             <span class="loader"></span>
         </div>

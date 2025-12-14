@@ -379,44 +379,45 @@ Feature Area
 Blog/News Area
 ==============================-->
 <?php if (!empty($all_posts)): ?>
-<div class="space" data-bg-src="<?= base_url('assets/img/bg/blog-bg.png') ?>">
-    <div class="container">
-        <div class="row justify-content-lg-between justify-content-center align-items-end">
-            <div class="col-lg-7 col-md-8">
-                <div class="title-area text-center text-lg-start">
-                    <span class="sub-title"><i class="fal fa-book me-2"></i> Berita & Artikel</span>
-                    <h2 class="sec-title">Informasi Terbaru</h2>
-                </div>
-            </div>
-            <div class="col-lg-auto col-md-4">
-                <div class="sec-btn">
-                    <a href="<?= base_url('berita') ?>" class="th-btn">Lihat Semua<i class="fa-solid fa-arrow-right ms-2"></i></a>
-                </div>
-            </div>
-        </div>
-        <div class="row gy-4">
-            <?php foreach (array_slice($all_posts, 0, 3) as $post): ?>
-            <div class="col-md-6 col-xl-4">
-                <div class="blog-card">
-                    <div class="blog-img">
-                        <img src="<?= base_url('uploads/posts/' . $post['gambar']) ?>" alt="<?= esc($post['judul_tulisan']) ?>">
+    <div class="space" data-bg-src="<?= base_url('assets/img/bg/blog-bg.png') ?>">
+        <div class="container">
+            <div class="row justify-content-lg-between justify-content-center align-items-end">
+                <div class="col-lg-7 col-md-8">
+                    <div class="title-area text-center text-lg-start">
+                        <span class="sub-title"><i class="fal fa-book me-2"></i> Berita & Artikel</span>
+                        <h2 class="sec-title">Informasi Terbaru</h2>
                     </div>
-                    <div class="blog-content">
-                        <div class="blog-meta">
-                            <a href="#"><i class="fa-light fa-user"></i><?= esc($post['penulis']) ?></a>
-                            <a href="#"><i class="fa-light fa-calendar"></i><?php helper('app'); echo format_date_indonesia($post['waktu_posting']) ?></a>
+                </div>
+                <div class="col-lg-auto col-md-4">
+                    <div class="sec-btn">
+                        <a href="<?= base_url('berita') ?>" class="th-btn">Lihat Semua<i class="fa-solid fa-arrow-right ms-2"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="row gy-4">
+                <?php foreach (array_slice($all_posts, 0, 3) as $post): ?>
+                    <div class="col-md-6 col-xl-4">
+                        <div class="blog-card">
+                            <div class="blog-img">
+                                <img src="<?= base_url('uploads/posts/' . $post['gambar']) ?>" alt="<?= esc($post['judul_tulisan']) ?>">
+                            </div>
+                            <div class="blog-content">
+                                <div class="blog-meta">
+                                    <a href="#"><i class="fa-light fa-user"></i><?= esc($post['penulis']) ?></a>
+                                    <a href="#"><i class="fa-light fa-calendar"></i><?php helper('app');
+                                                                                    echo format_date_indonesia($post['waktu_posting']) ?></a>
+                                </div>
+                                <h3 class="box-title">
+                                    <a href="<?= base_url('berita/' . $post['slug']) ?>"><?= esc($post['judul_tulisan']) ?></a>
+                                </h3>
+                                <a href="<?= base_url('berita/' . $post['slug']) ?>" class="th-btn style3">Baca Selengkapnya<i class="fa-regular fa-arrow-right ms-2"></i></a>
+                            </div>
                         </div>
-                        <h3 class="box-title">
-                            <a href="<?= base_url('berita/' . $post['slug']) ?>"><?= esc($post['judul_tulisan']) ?></a>
-                        </h3>
-                        <a href="<?= base_url('berita/' . $post['slug']) ?>" class="th-btn style3">Baca Selengkapnya<i class="fa-regular fa-arrow-right ms-2"></i></a>
                     </div>
-                </div>
+                <?php endforeach; ?>
             </div>
-            <?php endforeach; ?>
         </div>
     </div>
-</div>
 <?php endif; ?>
 
 <!--==============================
