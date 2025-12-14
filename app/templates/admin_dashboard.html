@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - SPK{% endblock %}
+
+{% block content %}
+<h2><i class="bi bi-gear"></i> Admin Dashboard</h2>
+<hr>
+
+<div class="row">
+    <div class="col-md-3 mb-4">
+        <div class="card text-center bg-primary text-white">
+            <div class="card-body">
+                <h3>{{ stats.total }}</h3>
+                <p class="mb-0">Total Anggota</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-4">
+        <div class="card text-center bg-warning">
+            <div class="card-body">
+                <h3>{{ stats.pending }}</h3>
+                <p class="mb-0">Menunggu Persetujuan</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-4">
+        <div class="card text-center bg-success text-white">
+            <div class="card-body">
+                <h3>{{ stats.active }}</h3>
+                <p class="mb-0">Anggota Aktif</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-4">
+        <div class="card text-center bg-danger text-white">
+            <div class="card-body">
+                <h3>{{ stats.terminated }}</h3>
+                <p class="mb-0">Diberhentikan</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-people"></i> Manajemen Anggota</h5>
+            </div>
+            <div class="card-body">
+                <a href="{{ url_for('members.list_members') }}" class="btn btn-primary">
+                    <i class="bi bi-list"></i> Lihat Semua Anggota
+                </a>
+                <a href="{{ url_for('members.list_members', status='pending') }}" class="btn btn-warning">
+                    <i class="bi bi-clock"></i> Persetujuan Pending
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-clipboard-check"></i> Manajemen Survei</h5>
+            </div>
+            <div class="card-body">
+                <a href="{{ url_for('survey.create_survey') }}" class="btn btn-success">
+                    <i class="bi bi-plus-circle"></i> Buat Survei Baru
+                </a>
+                <a href="{{ url_for('survey.index') }}" class="btn btn-info text-white">
+                    <i class="bi bi-list"></i> Lihat Semua Survei
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0"><i class="bi bi-graph-up"></i> Statistik</h5>
+    </div>
+    <div class="card-body">
+        <a href="{{ url_for('admin.statistics') }}" class="btn btn-primary">
+            <i class="bi bi-bar-chart"></i> Lihat Statistik Detail
+        </a>
+    </div>
+</div>
+{% endblock %}

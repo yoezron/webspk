@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}Buat Survei - SPK{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="mb-0"><i class="bi bi-clipboard-plus"></i> Buat Survei Baru</h3>
+            </div>
+            <div class="card-body">
+                <form method="POST" id="surveyForm">
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Judul Survei</label>
+                        <input type="text" class="form-control" id="title" name="title" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Deskripsi</label>
+                        <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                    </div>
+                    
+                    <hr>
+                    <h5>Pertanyaan</h5>
+                    <div id="questionsContainer">
+                        <div class="question-item card mb-3">
+                            <div class="card-body">
+                                <div class="mb-2">
+                                    <label class="form-label">Pertanyaan 1</label>
+                                    <input type="text" class="form-control" name="question_0_text" required>
+                                </div>
+                                <div class="mb-2">
+                                    <label class="form-label">Tipe Pertanyaan</label>
+                                    <select class="form-select" name="question_0_type">
+                                        <option value="text">Teks</option>
+                                        <option value="multiple_choice">Pilihan Ganda</option>
+                                        <option value="rating">Rating</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button type="button" class="btn btn-secondary mb-3" onclick="addQuestion()">
+                        <i class="bi bi-plus-circle"></i> Tambah Pertanyaan
+                    </button>
+                    
+                    <input type="hidden" name="question_count" id="questionCount" value="1">
+                    
+                    <hr>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-save"></i> Simpan Survei
+                    </button>
+                    <a href="{{ url_for('survey.index') }}" class="btn btn-secondary">Batal</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let questionCount = 1;
+
+function addQuestion() {
+    const container = document.getElementById('questionsContainer');
+    const questionDiv = document.createElement('div');
+    questionDiv.className = 'question-item card mb-3';
+    questionDiv.innerHTML = `
+        <div class="card-body">
+            <div class="mb-2">
+                <label class="form-label">Pertanyaan ${questionCount + 1}</label>
+                <input type="text" class="form-control" name="question_${questionCount}_text" required>
+            </div>
+            <div class="mb-2">
+                <label class="form-label">Tipe Pertanyaan</label>
+                <select class="form-select" name="question_${questionCount}_type">
+                    <option value="text">Teks</option>
+                    <option value="multiple_choice">Pilihan Ganda</option>
+                    <option value="rating">Rating</option>
+                </select>
+            </div>
+        </div>
+    `;
+    container.appendChild(questionDiv);
+    questionCount++;
+    document.getElementById('questionCount').value = questionCount;
+}
+</script>
+{% endblock %}

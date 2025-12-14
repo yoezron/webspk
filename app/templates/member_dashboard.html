@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - SPK{% endblock %}
+
+{% block content %}
+<h2><i class="bi bi-speedometer2"></i> Dashboard Anggota</h2>
+<hr>
+
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="bi bi-person-badge" style="font-size: 3rem; color: #3498db;"></i>
+                <h5 class="card-title mt-3">Profil Saya</h5>
+                <p class="card-text">Lihat dan kelola informasi keanggotaan Anda</p>
+                <a href="{{ url_for('members.profile') }}" class="btn btn-primary">Lihat Profil</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="bi bi-chat-dots" style="font-size: 3rem; color: #27ae60;"></i>
+                <h5 class="card-title mt-3">Forum</h5>
+                <p class="card-text">Berdiskusi dengan sesama anggota</p>
+                <a href="{{ url_for('forum.index') }}" class="btn btn-success">Buka Forum</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="bi bi-clipboard-data" style="font-size: 3rem; color: #e74c3c;"></i>
+                <h5 class="card-title mt-3">Survei</h5>
+                <p class="card-text">Ikuti survei dan berikan masukan</p>
+                <a href="{{ url_for('survey.index') }}" class="btn btn-danger">Lihat Survei</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mt-4">
+    <div class="card-header">
+        <h5 class="mb-0"><i class="bi bi-info-circle"></i> Informasi Penting</h5>
+    </div>
+    <div class="card-body">
+        <p>Selamat datang di portal keanggotaan Serikat Pekerja Kampus!</p>
+        <ul>
+            <li>Pastikan data profil Anda selalu terkini</li>
+            <li>Ikuti forum untuk mendapatkan informasi terbaru</li>
+            <li>Partisipasi Anda dalam survei sangat berarti bagi organisasi</li>
+        </ul>
+    </div>
+</div>
+{% endblock %}

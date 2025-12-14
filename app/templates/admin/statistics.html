@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}Statistik - SPK{% endblock %}
+
+{% block content %}
+<h2><i class="bi bi-graph-up"></i> Statistik Keanggotaan</h2>
+<hr>
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Anggota per Departemen</h5>
+            </div>
+            <div class="card-body">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Departemen</th>
+                            <th>Jumlah Anggota</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for dept, count in departments %}
+                        <tr>
+                            <td>{{ dept or 'Tidak disebutkan' }}</td>
+                            <td><strong>{{ count }}</strong></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Anggota per Status</h5>
+            </div>
+            <div class="card-body">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Status</th>
+                            <th>Jumlah</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for status, count in statuses %}
+                        <tr>
+                            <td>
+                                {% if status == 'active' %}
+                                    <span class="badge bg-success">Aktif</span>
+                                {% elif status == 'pending' %}
+                                    <span class="badge bg-warning">Pending</span>
+                                {% elif status == 'terminated' %}
+                                    <span class="badge bg-danger">Diberhentikan</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">{{ status }}</span>
+                                {% endif %}
+                            </td>
+                            <td><strong>{{ count }}</strong></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">Informasi</h5>
+    </div>
+    <div class="card-body">
+        <p>Statistik ini diperbarui secara real-time berdasarkan data keanggotaan terkini.</p>
+        <a href="{{ url_for('admin.dashboard') }}" class="btn btn-primary">
+            <i class="bi bi-arrow-left"></i> Kembali ke Dashboard
+        </a>
+    </div>
+</div>
+{% endblock %}

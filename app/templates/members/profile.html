@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block title %}Profil Anggota - SPK{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="mb-0"><i class="bi bi-person-circle"></i> Profil Anggota</h3>
+            </div>
+            <div class="card-body">
+                <table class="table table-bordered">
+                    <tr>
+                        <th width="200">Status</th>
+                        <td>
+                            {% if member.status == 'active' %}
+                                <span class="badge bg-success">Aktif</span>
+                            {% elif member.status == 'pending' %}
+                                <span class="badge bg-warning">Menunggu Persetujuan</span>
+                            {% elif member.status == 'terminated' %}
+                                <span class="badge bg-danger">Diberhentikan</span>
+                            {% else %}
+                                <span class="badge bg-secondary">{{ member.status }}</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% if member.member_number %}
+                    <tr>
+                        <th>Nomor Anggota</th>
+                        <td><strong>{{ member.member_number }}</strong></td>
+                    </tr>
+                    {% endif %}
+                    <tr>
+                        <th>Nama Lengkap</th>
+                        <td>{{ member.full_name }}</td>
+                    </tr>
+                    <tr>
+                        <th>Email</th>
+                        <td>{{ current_user.email }}</td>
+                    </tr>
+                    {% if member.id_number %}
+                    <tr>
+                        <th>Nomor Identitas</th>
+                        <td>{{ member.id_number }}</td>
+                    </tr>
+                    {% endif %}
+                    {% if member.phone %}
+                    <tr>
+                        <th>Telepon</th>
+                        <td>{{ member.phone }}</td>
+                    </tr>
+                    {% endif %}
+                    {% if member.address %}
+                    <tr>
+                        <th>Alamat</th>
+                        <td>{{ member.address }}</td>
+                    </tr>
+                    {% endif %}
+                    {% if member.department %}
+                    <tr>
+                        <th>Departemen</th>
+                        <td>{{ member.department }}</td>
+                    </tr>
+                    {% endif %}
+                    {% if member.position %}
+                    <tr>
+                        <th>Jabatan</th>
+                        <td>{{ member.position }}</td>
+                    </tr>
+                    {% endif %}
+                    <tr>
+                        <th>Tanggal Bergabung</th>
+                        <td>{{ member.join_date.strftime('%d/%m/%Y') }}</td>
+                    </tr>
+                </table>
+
+                {% if member.card_issued and member.card_path %}
+                <div class="alert alert-success mt-3">
+                    <i class="bi bi-card-heading"></i> Kartu anggota Anda sudah diterbitkan!
+                    <a href="{{ url_for('members.download_card', member_id=member.id) }}" class="btn btn-sm btn-success ms-2">
+                        <i class="bi bi-download"></i> Download Kartu
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Informasi</h5>
+            </div>
+            <div class="card-body">
+                <p><i class="bi bi-info-circle"></i> Status keanggotaan Anda: 
+                    <strong>
+                        {% if member.status == 'active' %}Aktif{% elif member.status == 'pending' %}Menunggu Persetujuan{% elif member.status == 'terminated' %}Diberhentikan{% else %}{{ member.status }}{% endif %}
+                    </strong>
+                </p>
+                {% if member.status == 'pending' %}
+                <p class="text-muted">Pendaftaran Anda sedang diproses oleh admin. Mohon tunggu persetujuan.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

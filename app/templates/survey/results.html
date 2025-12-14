@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}Hasil Survei - {{ survey.title }}{% endblock %}
+
+{% block content %}
+<div class="mb-3">
+    <a href="{{ url_for('survey.index') }}" class="btn btn-sm btn-outline-secondary">
+        <i class="bi bi-arrow-left"></i> Kembali
+    </a>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header">
+        <h3 class="mb-0">{{ survey.title }}</h3>
+        <p class="mb-0 text-muted">Total Responden: {{ survey.responses.count() }}</p>
+    </div>
+</div>
+
+{% for question_id, data in results.items() %}
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="mb-0">{{ data.question }}</h5>
+    </div>
+    <div class="card-body">
+        {% if data.type == 'text' %}
+            <ul class="list-unstyled">
+                {% for answer in data.answers %}
+                <li class="mb-2"><i class="bi bi-chat-quote"></i> {{ answer }}</li>
+                {% endfor %}
+            </ul>
+        
+        {% elif data.type in ['multiple_choice', 'rating'] %}
+            {% set answer_counts = {} %}
+            {% for answer in data.answers %}
+                {% if answer_counts.update({answer: answer_counts.get(answer, 0) + 1}) %}{% endif %}
+            {% endfor %}
+            
+            <table class="table table-sm">
+                <thead>
+                    <tr>
+                        <th>Jawaban</th>
+                        <th>Jumlah</th>
+                        <th>Persentase</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for answer, count in answer_counts.items() %}
+                    <tr>
+                        <td>{{ answer }}</td>
+                        <td>{{ count }}</td>
+                        <td>
+                            {% set percentage = (count / data.answers|length * 100) if data.answers|length > 0 else 0 %}
+                            <div class="progress" style="width: 200px;">
+                                <div class="progress-bar" role="progressbar" 
+                                     style="width: {{ percentage }}%">
+                                    {{ "%.1f"|format(percentage) }}%
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    </div>
+</div>
+{% endfor %}
+{% endblock %}

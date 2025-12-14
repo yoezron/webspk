@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="jumbotron bg-light p-5 rounded-3">
+    <h1 class="display-4">Selamat Datang di Portal SPK</h1>
+    <p class="lead">Sistem Informasi Keanggotaan Serikat Pekerja Kampus</p>
+    <hr class="my-4">
+    <p>Portal ini menyediakan layanan lengkap untuk pengelolaan keanggotaan serikat pekerja kampus, termasuk:</p>
+    <ul>
+        <li>Registrasi dan pengelolaan keanggotaan</li>
+        <li>Penerbitan nomor dan kartu anggota</li>
+        <li>Forum komunikasi anggota</li>
+        <li>Sistem survei dan pengumpulan data</li>
+        <li>Statistik dan informasi keanggotaan</li>
+    </ul>
+    {% if not current_user.is_authenticated %}
+    <p class="mt-4">
+        <a class="btn btn-primary btn-lg me-2" href="{{ url_for('auth.register') }}" role="button">
+            <i class="bi bi-person-plus"></i> Daftar Sekarang
+        </a>
+        <a class="btn btn-outline-secondary btn-lg" href="{{ url_for('auth.login') }}" role="button">
+            <i class="bi bi-box-arrow-in-right"></i> Login
+        </a>
+    </p>
+    {% endif %}
+</div>
+
+<div class="row mt-5">
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-person-badge"></i> Pendaftaran</h5>
+                <p class="card-text">Daftar sebagai anggota serikat pekerja kampus dengan mudah dan cepat.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-card-heading"></i> Kartu Anggota</h5>
+                <p class="card-text">Dapatkan nomor dan kartu anggota resmi setelah pendaftaran disetujui.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-chat-square-text"></i> Forum Komunikasi</h5>
+                <p class="card-text">Berinteraksi dan berdiskusi dengan sesama anggota serikat pekerja.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-clipboard-check"></i> Survei</h5>
+                <p class="card-text">Ikuti survei dan berikan masukan untuk kemajuan organisasi.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-graph-up"></i> Statistik</h5>
+                <p class="card-text">Lihat data dan statistik keanggotaan secara transparan.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-info-circle"></i> Informasi</h5>
+                <p class="card-text">Dapatkan informasi terkini yang relevan untuk anggota.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

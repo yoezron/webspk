@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Pendaftaran Anggota - SPK{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="mb-0"><i class="bi bi-person-badge"></i> Formulir Pendaftaran Anggota</h3>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="full_name" class="form-label">Nama Lengkap *</label>
+                        <input type="text" class="form-control" id="full_name" name="full_name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_number" class="form-label">Nomor Identitas (KTP/NIP)</label>
+                        <input type="text" class="form-control" id="id_number" name="id_number">
+                    </div>
+                    <div class="mb-3">
+                        <label for="phone" class="form-label">Nomor Telepon</label>
+                        <input type="tel" class="form-control" id="phone" name="phone">
+                    </div>
+                    <div class="mb-3">
+                        <label for="address" class="form-label">Alamat</label>
+                        <textarea class="form-control" id="address" name="address" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="department" class="form-label">Departemen/Unit Kerja</label>
+                        <input type="text" class="form-control" id="department" name="department">
+                    </div>
+                    <div class="mb-3">
+                        <label for="position" class="form-label">Jabatan/Posisi</label>
+                        <input type="text" class="form-control" id="position" name="position">
+                    </div>
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i> 
+                        Pendaftaran Anda akan diproses oleh admin. Anda akan menerima nomor anggota setelah pendaftaran disetujui.
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-send"></i> Kirim Pendaftaran
+                    </button>
+                    <a href="{{ url_for('main.dashboard') }}" class="btn btn-secondary">Batal</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

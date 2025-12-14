@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}Daftar Anggota - SPK{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h3 class="mb-0"><i class="bi bi-people"></i> Daftar Anggota</h3>
+        <div>
+            <a href="{{ url_for('members.list_members', status='all') }}" class="btn btn-sm btn-outline-secondary {% if status_filter == 'all' %}active{% endif %}">Semua</a>
+            <a href="{{ url_for('members.list_members', status='pending') }}" class="btn btn-sm btn-outline-warning {% if status_filter == 'pending' %}active{% endif %}">Pending</a>
+            <a href="{{ url_for('members.list_members', status='active') }}" class="btn btn-sm btn-outline-success {% if status_filter == 'active' %}active{% endif %}">Aktif</a>
+            <a href="{{ url_for('members.list_members', status='terminated') }}" class="btn btn-sm btn-outline-danger {% if status_filter == 'terminated' %}active{% endif %}">Diberhentikan</a>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Nomor Anggota</th>
+                        <th>Nama</th>
+                        <th>Departemen</th>
+                        <th>Status</th>
+                        <th>Tanggal Daftar</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for member in members %}
+                    <tr>
+                        <td>{{ member.member_number or '-' }}</td>
+                        <td>{{ member.full_name }}</td>
+                        <td>{{ member.department or '-' }}</td>
+                        <td>
+                            {% if member.status == 'active' %}
+                                <span class="badge bg-success">Aktif</span>
+                            {% elif member.status == 'pending' %}
+                                <span class="badge bg-warning">Pending</span>
+                            {% elif member.status == 'terminated' %}
+                                <span class="badge bg-danger">Diberhentikan</span>
+                            {% else %}
+                                <span class="badge bg-secondary">{{ member.status }}</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ member.created_at.strftime('%d/%m/%Y') }}</td>
+                        <td>
+                            {% if member.status == 'pending' %}
+                                <form method="POST" action="{{ url_for('admin.approve_member', member_id=member.id) }}" style="display:inline;">
+                                    <button type="submit" class="btn btn-sm btn-success" onclick="return confirm('Setujui anggota ini?')">
+                                        <i class="bi bi-check-circle"></i>
+                                    </button>
+                                </form>
+                                <form method="POST" action="{{ url_for('admin.reject_member', member_id=member.id) }}" style="display:inline;">
+                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Tolak pendaftaran ini?')">
+                                        <i class="bi bi-x-circle"></i>
+                                    </button>
+                                </form>
+                            {% endif %}
+                            {% if member.status == 'active' %}
+                                {% if not member.card_issued %}
+                                <form method="POST" action="{{ url_for('admin.issue_card', member_id=member.id) }}" style="display:inline;">
+                                    <button type="submit" class="btn btn-sm btn-primary">
+                                        <i class="bi bi-card-heading"></i> Terbitkan Kartu
+                                    </button>
+                                </form>
+                                {% else %}
+                                <span class="badge bg-info"><i class="bi bi-check"></i> Kartu Terbit</span>
+                                {% endif %}
+                                <form method="POST" action="{{ url_for('admin.terminate_member', member_id=member.id) }}" style="display:inline;">
+                                    <button type="submit" class="btn btn-sm btn-warning" onclick="return confirm('Hentikan keanggotaan ini?')">
+                                        <i class="bi bi-person-x"></i>
+                                    </button>
+                                </form>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

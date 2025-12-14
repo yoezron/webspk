@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}{{ survey.title }} - SPK{% endblock %}
+
+{% block content %}
+<div class="mb-3">
+    <a href="{{ url_for('survey.index') }}" class="btn btn-sm btn-outline-secondary">
+        <i class="bi bi-arrow-left"></i> Kembali
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h3 class="mb-0">{{ survey.title }}</h3>
+        {% if survey.description %}
+        <p class="mb-0 text-muted">{{ survey.description }}</p>
+        {% endif %}
+    </div>
+    <div class="card-body">
+        {% if already_responded %}
+        <div class="alert alert-info">
+            <i class="bi bi-check-circle"></i> Anda sudah mengisi survei ini. Terima kasih atas partisipasinya!
+        </div>
+        {% else %}
+        <form method="POST" action="{{ url_for('survey.submit_survey', survey_id=survey.id) }}">
+            {% for question in survey.questions.order_by('order') %}
+            <div class="mb-4">
+                <label class="form-label fw-bold">{{ loop.index }}. {{ question.question_text }}</label>
+                
+                {% if question.question_type == 'text' %}
+                    <textarea class="form-control" name="question_{{ question.id }}" rows="3" required></textarea>
+                
+                {% elif question.question_type == 'multiple_choice' %}
+                    {% set options = question.options.split(',') if question.options else [] %}
+                    {% for option in options %}
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="question_{{ question.id }}" 
+                               id="q{{ question.id }}_{{ loop.index }}" value="{{ option.strip() }}" required>
+                        <label class="form-check-label" for="q{{ question.id }}_{{ loop.index }}">
+                            {{ option.strip() }}
+                        </label>
+                    </div>
+                    {% endfor %}
+                
+                {% elif question.question_type == 'rating' %}
+                    <select class="form-select" name="question_{{ question.id }}" required>
+                        <option value="">Pilih rating...</option>
+                        <option value="1">1 - Sangat Tidak Setuju</option>
+                        <option value="2">2 - Tidak Setuju</option>
+                        <option value="3">3 - Netral</option>
+                        <option value="4">4 - Setuju</option>
+                        <option value="5">5 - Sangat Setuju</option>
+                    </select>
+                {% endif %}
+            </div>
+            {% endfor %}
+            
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-send"></i> Kirim Jawaban
+            </button>
+        </form>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
