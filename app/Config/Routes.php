@@ -82,7 +82,7 @@ $routes->group('member', ['filter' => 'rbac:member,coordinator,treasurer', 'name
     // Payment/Dues
     $routes->get('payment', 'Payment::index');
     $routes->get('payment/submit', 'Payment::submit');
-    $routes->post('payment/submit', 'Payment::processSubmit');
+    $routes->post('payment/process', 'Payment::processSubmit');
     $routes->get('payment/view/(:num)', 'Payment::view/$1');
 });
 
