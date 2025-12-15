@@ -102,13 +102,13 @@ class Register extends BaseController
             return redirect()->back()->withInput()->with('validation', $this->validator);
         }
 
-        // Create initial member record
+        // Create initial member record with sanitized data
         $memberData = [
-            'email' => $this->request->getPost('email'),
+            'email' => trim(strtolower($this->request->getPost('email'))),
             'password' => $this->request->getPost('password'),
-            'full_name' => $this->request->getPost('full_name'),
-            'phone_number' => $this->request->getPost('phone_number'),
-            'university_name' => $this->request->getPost('university_name'),
+            'full_name' => trim($this->request->getPost('full_name')),
+            'phone_number' => trim($this->request->getPost('phone_number')),
+            'university_name' => trim($this->request->getPost('university_name')),
             'role' => 'candidate',
             'membership_status' => 'candidate',
             'onboarding_state' => 'registered',
@@ -145,6 +145,7 @@ class Register extends BaseController
 
         if (!$emailSent) {
             log_message('error', 'Failed to send verification email to: ' . $member['email']);
+            // Don't block registration if email fails
         }
 
         // Set session for continuation
@@ -152,9 +153,11 @@ class Register extends BaseController
             'registration_member_id' => $memberId,
             'registration_member_uuid' => $member['uuid'],
             'registration_step' => 1, // Keep at step 1 until email verified
+            'registration_email' => $member['email'],
+            'registration_name' => $member['full_name'],
         ]);
 
-        return redirect()->to(base_url('registrasi/verifikasi-email'))->with('success', 'Akun berhasil dibuat. Silakan cek email Anda untuk verifikasi.');
+        return redirect()->to(base_url('registrasi/verifikasi-email'))->with('success', 'Akun berhasil dibuat! Silakan cek email Anda untuk verifikasi sebelum melanjutkan.');
     }
 
     /**
