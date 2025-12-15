@@ -133,6 +133,17 @@ class PaymentManagement extends BaseController
                 $periodText
             );
 
+            // Audit log
+            helper('audit');
+            audit_log_payment_action(
+                'verify',
+                $id,
+                "Payment #{$id} - {$member['member_number']}",
+                "Payment Rp " . number_format($payment['amount'], 0, ',', '.') . " for {$periodText} verified",
+                ['status' => $payment['status']],
+                $updateData
+            );
+
             log_message('info', "Payment verified: ID {$id} by admin " . session()->get('user_id'));
 
             return redirect()->back()->with('success', 'Pembayaran berhasil diverifikasi dan email konfirmasi telah dikirim');
@@ -171,6 +182,18 @@ class PaymentManagement extends BaseController
         ];
 
         if ($this->paymentModel->update($id, $updateData)) {
+            // Audit log
+            helper('audit');
+            $member = $this->memberModel->find($payment['member_id']);
+            audit_log_payment_action(
+                'reject',
+                $id,
+                "Payment #{$id} - " . ($member['member_number'] ?? $payment['member_id']),
+                "Payment rejected: {$reason}",
+                ['status' => $payment['status']],
+                $updateData
+            );
+
             log_message('info', "Payment rejected: ID {$id} by admin " . session()->get('user_id'));
             return redirect()->back()->with('success', 'Pembayaran ditolak');
         } else {

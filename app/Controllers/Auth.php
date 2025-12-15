@@ -84,6 +84,10 @@ class Auth extends BaseController
             // Increment failed attempts
             $this->memberModel->incrementFailedAttempts($member['id']);
 
+            // Audit log failed login
+            helper('audit');
+            audit_log_failed_login($email, 'Invalid password');
+
             return redirect()->back()->withInput()->with('error', 'Email atau password salah');
         }
 
@@ -127,7 +131,9 @@ class Auth extends BaseController
             $this->response->setCookie('remember_token', $member['uuid'], 30 * 24 * 60 * 60);
         }
 
-        // Log successful login (will implement audit log later)
+        // Audit log successful login
+        helper('audit');
+        audit_log_login($member['id'], $member['email'], 'success');
 
         // Redirect based on role and status
         return $this->redirectAfterLogin($member);
@@ -172,7 +178,13 @@ class Auth extends BaseController
      */
     public function logout()
     {
-        // Log logout (will implement audit log later)
+        // Audit log logout
+        helper('audit');
+        $userId = session()->get('user_id');
+        $userEmail = session()->get('user_email');
+        if ($userId && $userEmail) {
+            audit_log_logout($userId, $userEmail);
+        }
 
         // Destroy session
         session()->destroy();
@@ -228,13 +240,21 @@ class Auth extends BaseController
         // Generate reset token
         $token = $this->memberModel->generateResetToken($member['id']);
 
-        // Send email with reset link (will implement email service later)
-        // For now, just return success message
-        $resetLink = base_url("reset-password/{$token}");
+        // Send password reset email
+        $emailService = new \App\Libraries\EmailService();
+        $emailSent = $emailService->sendPasswordReset(
+            $member['email'],
+            $member['full_name'],
+            $token
+        );
 
-        // TODO: Send email with $resetLink
-
-        return redirect()->back()->with('success', 'Instruksi reset password telah dikirim ke email Anda');
+        if ($emailSent) {
+            log_message('info', "Password reset email sent to {$member['email']}");
+            return redirect()->back()->with('success', 'Instruksi reset password telah dikirim ke email Anda');
+        } else {
+            log_message('error', "Failed to send password reset email to {$member['email']}");
+            return redirect()->back()->with('error', 'Gagal mengirim email reset password. Silakan coba lagi nanti.');
+        }
     }
 
     /**
