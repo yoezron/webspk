@@ -411,12 +411,28 @@ class Register extends BaseController
         // Update member data
         $this->memberModel->update($memberId, $updateData);
 
+        // Send email verification
+        $emailService = new \App\Libraries\EmailService();
+        $member = $this->memberModel->find($memberId);
+
+        if ($member && !empty($member['email_verification_token'])) {
+            $emailSent = $emailService->sendEmailVerification(
+                $member['email'],
+                $member['full_name'],
+                $member['email_verification_token']
+            );
+
+            if ($emailSent) {
+                log_message('info', "Email verification sent to {$member['email']} after registration completion");
+            } else {
+                log_message('error', "Failed to send verification email to {$member['email']}");
+            }
+        }
+
         // Clear registration session
         session()->remove(['registration_member_id', 'registration_member_uuid', 'registration_step']);
 
-        // TODO: Send email verification here
-
-        return redirect()->to(base_url('registrasi/selesai'))->with('success', 'Pendaftaran berhasil diselesaikan');
+        return redirect()->to(base_url('registrasi/selesai'))->with('success', 'Pendaftaran berhasil diselesaikan. Silakan cek email Anda untuk verifikasi.');
     }
 
     /**

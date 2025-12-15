@@ -5,14 +5,15 @@ namespace App\Filters;
 use CodeIgniter\Filters\FilterInterface;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
+use App\Models\RBACPermissionModel;
 
 class RBACFilter implements FilterInterface
 {
     /**
-     * Check if user has required role before allowing access
+     * Check if user has required role or permission before allowing access
      *
      * @param RequestInterface $request
-     * @param array|null $arguments - Array of allowed roles
+     * @param array|null $arguments - Array of allowed roles OR permissions (prefixed with 'perm:')
      * @return mixed
      */
     public function before(RequestInterface $request, $arguments = null)
@@ -22,7 +23,8 @@ class RBACFilter implements FilterInterface
             return redirect()->to(base_url('login'))->with('error', 'Silakan login terlebih dahulu');
         }
 
-        // Get user role
+        // Get user data
+        $userId = session()->get('user_id');
         $userRole = session()->get('user_role');
 
         // If no arguments provided, just check if authenticated
@@ -30,9 +32,37 @@ class RBACFilter implements FilterInterface
             return;
         }
 
-        // Check if user role is in allowed roles
-        if (!in_array($userRole, $arguments)) {
-            // Redirect based on role
+        // Check if arguments contain permissions (prefixed with 'perm:')
+        $hasPermissionCheck = false;
+        $requiredPermissions = [];
+        $allowedRoles = [];
+
+        foreach ($arguments as $arg) {
+            if (strpos($arg, 'perm:') === 0) {
+                $hasPermissionCheck = true;
+                $requiredPermissions[] = substr($arg, 5); // Remove 'perm:' prefix
+            } else {
+                $allowedRoles[] = $arg;
+            }
+        }
+
+        // If permission check is required
+        if ($hasPermissionCheck) {
+            $permissionModel = new RBACPermissionModel();
+
+            // Check if user has at least one of the required permissions
+            foreach ($requiredPermissions as $permission) {
+                if ($permissionModel->userHasPermission($userId, $permission)) {
+                    return; // User has permission, allow access
+                }
+            }
+
+            // User doesn't have required permissions
+            return $this->redirectUnauthorized($userRole);
+        }
+
+        // Otherwise, check role-based access
+        if (!empty($allowedRoles) && !in_array($userRole, $allowedRoles)) {
             return $this->redirectUnauthorized($userRole);
         }
     }

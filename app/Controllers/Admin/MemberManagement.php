@@ -147,6 +147,17 @@ class MemberManagement extends BaseController
                 $memberNumber
             );
 
+            // Audit log
+            helper('audit');
+            audit_log_member_action(
+                'approve',
+                $id,
+                $memberNumber,
+                "Member {$member['full_name']} ({$memberNumber}) approved by admin",
+                ['status' => $member['account_status'], 'onboarding_state' => $member['onboarding_state']],
+                $updateData
+            );
+
             log_message('info', "Member approved: ID {$id}, Number: {$memberNumber} by admin " . session()->get('user_id'));
 
             return redirect()->back()->with('success', 'Anggota berhasil disetujui dan email notifikasi telah dikirim');
@@ -192,6 +203,17 @@ class MemberManagement extends BaseController
                 $reason
             );
 
+            // Audit log
+            helper('audit');
+            audit_log_member_action(
+                'reject',
+                $id,
+                $member['email'],
+                "Member {$member['full_name']} ({$member['email']}) rejected: {$reason}",
+                ['status' => $member['account_status'], 'onboarding_state' => $member['onboarding_state']],
+                $updateData
+            );
+
             log_message('info', "Member rejected: ID {$id} by admin " . session()->get('user_id'));
 
             return redirect()->back()->with('success', 'Anggota ditolak dan email notifikasi telah dikirim');
@@ -227,6 +249,17 @@ class MemberManagement extends BaseController
         ];
 
         if ($this->memberModel->update($id, $updateData)) {
+            // Audit log
+            helper('audit');
+            audit_log_member_action(
+                'suspend',
+                $id,
+                $member['member_number'] ?? $member['email'],
+                "Member {$member['full_name']} suspended: {$reason}",
+                ['status' => $member['account_status']],
+                $updateData
+            );
+
             log_message('info', "Member suspended: ID {$id} by admin " . session()->get('user_id'));
             return redirect()->back()->with('success', 'Anggota berhasil ditangguhkan');
         } else {
