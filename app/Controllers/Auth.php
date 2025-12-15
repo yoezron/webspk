@@ -45,15 +45,15 @@ class Auth extends BaseController
                 'rules' => 'required|valid_email',
                 'errors' => [
                     'required' => 'Email wajib diisi',
-                    'valid_email' => 'Email tidak valid',
+                    'valid_email' => 'Format email tidak valid',
                 ],
             ],
             'password' => [
                 'label' => 'Password',
-                'rules' => 'required|min_length[6]',
+                'rules' => 'required|min_length[8]',
                 'errors' => [
                     'required' => 'Password wajib diisi',
-                    'min_length' => 'Password minimal 6 karakter',
+                    'min_length' => 'Password minimal 8 karakter',
                 ],
             ],
         ];
@@ -62,7 +62,8 @@ class Auth extends BaseController
             return redirect()->back()->withInput()->with('validation', $this->validator);
         }
 
-        $email = $this->request->getPost('email');
+        // Sanitize inputs
+        $email = trim(strtolower($this->request->getPost('email')));
         $password = $this->request->getPost('password');
         $remember = $this->request->getPost('remember');
 
@@ -70,13 +71,20 @@ class Auth extends BaseController
         $member = $this->memberModel->findByEmail($email);
 
         if (!$member) {
-            return redirect()->back()->withInput()->with('error', 'Email atau password salah');
+            // Audit log failed login attempt
+            helper('audit');
+            audit_log_failed_login($email, 'Email not found');
+
+            return redirect()->back()->withInput()->with('error', 'Email atau password yang Anda masukkan salah. Silakan coba lagi.');
         }
 
         // Check if account is locked
         if ($this->memberModel->isAccountLocked($member)) {
             $lockedUntil = date('H:i', strtotime($member['locked_until']));
-            return redirect()->back()->withInput()->with('error', "Akun Anda terkunci sampai {$lockedUntil} karena terlalu banyak percobaan login gagal");
+            $remainingTime = strtotime($member['locked_until']) - time();
+            $remainingMinutes = ceil($remainingTime / 60);
+
+            return redirect()->back()->withInput()->with('error', "Akun Anda terkunci sampai pukul {$lockedUntil} ({$remainingMinutes} menit lagi) karena terlalu banyak percobaan login yang gagal. Silakan coba lagi nanti.");
         }
 
         // Verify password
@@ -88,7 +96,15 @@ class Auth extends BaseController
             helper('audit');
             audit_log_failed_login($email, 'Invalid password');
 
-            return redirect()->back()->withInput()->with('error', 'Email atau password salah');
+            // Get failed attempts count
+            $updatedMember = $this->memberModel->find($member['id']);
+            $attemptsLeft = 5 - ($updatedMember['failed_login_attempts'] ?? 0);
+
+            if ($attemptsLeft > 0 && $attemptsLeft <= 3) {
+                return redirect()->back()->withInput()->with('error', "Email atau password yang Anda masukkan salah. Sisa percobaan: {$attemptsLeft}x");
+            }
+
+            return redirect()->back()->withInput()->with('error', 'Email atau password yang Anda masukkan salah. Silakan coba lagi.');
         }
 
         // Check account status
