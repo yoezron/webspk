@@ -24,6 +24,47 @@ class Auth extends BaseController
             return redirect()->to(base_url('dashboard'));
         }
 
+        // Check for remember me token (auto-login)
+        $rememberToken = $this->request->getCookie('remember_token');
+        if ($rememberToken) {
+            $member = $this->memberModel->findByRememberToken($rememberToken);
+
+            if ($member) {
+                // Auto-login successful - set session
+                $sessionData = [
+                    'user_id' => $member['id'],
+                    'user_uuid' => $member['uuid'],
+                    'user_email' => $member['email'],
+                    'user_name' => $member['full_name'],
+                    'user_role' => $member['role'],
+                    'membership_status' => $member['membership_status'],
+                    'onboarding_state' => $member['onboarding_state'],
+                    'account_status' => $member['account_status'],
+                    'is_logged_in' => true,
+                    'session_created_at' => date('Y-m-d H:i:s'), // For session invalidation
+                ];
+
+                session()->set($sessionData);
+
+                // Update last login
+                $this->memberModel->updateLastLogin(
+                    $member['id'],
+                    $this->request->getIPAddress(),
+                    $this->request->getUserAgent()->getAgentString()
+                );
+
+                // Audit log auto-login
+                helper('audit');
+                audit_log_login($member['id'], $member['email'], 'auto-login via remember token');
+
+                // Redirect based on role
+                return $this->redirectAfterLogin($member);
+            } else {
+                // Invalid or expired token - delete cookie
+                $this->response->deleteCookie('remember_token');
+            }
+        }
+
         $data = [
             'title' => 'Login',
             'description' => 'Login ke Sistem Informasi Serikat Pekerja Kampus',
@@ -137,14 +178,26 @@ class Auth extends BaseController
             'onboarding_state' => $member['onboarding_state'],
             'account_status' => $member['account_status'],
             'is_logged_in' => true,
+            'session_created_at' => date('Y-m-d H:i:s'), // For session invalidation
         ];
 
         session()->set($sessionData);
 
-        // Handle remember me
+        // Handle remember me with secure token
         if ($remember) {
-            // Set cookie for 30 days
-            $this->response->setCookie('remember_token', $member['uuid'], 30 * 24 * 60 * 60);
+            // Generate cryptographically secure random token
+            $rememberToken = $this->memberModel->generateRememberToken($member['id']);
+
+            // Set secure cookie for 30 days with httpOnly and secure flags
+            $this->response->setCookie([
+                'name'     => 'remember_token',
+                'value'    => $rememberToken,
+                'expire'   => 30 * 24 * 60 * 60, // 30 days
+                'path'     => '/',
+                'secure'   => true, // HTTPS only
+                'httponly' => true, // Not accessible via JavaScript
+                'samesite' => 'Lax', // CSRF protection
+            ]);
         }
 
         // Audit log successful login
@@ -200,6 +253,9 @@ class Auth extends BaseController
         $userEmail = session()->get('user_email');
         if ($userId && $userEmail) {
             audit_log_logout($userId, $userEmail);
+
+            // Clear remember token from database
+            $this->memberModel->clearRememberToken($userId);
         }
 
         // Destroy session

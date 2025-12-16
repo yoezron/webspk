@@ -79,7 +79,10 @@ class Payment extends BaseController
             return redirect()->back()->with('error', 'Member tidak ditemukan');
         }
 
-        // Validation
+        // Get member's monthly dues amount
+        $monthlyDues = (float) $member['monthly_dues_amount'];
+
+        // Validation rules
         $rules = [
             'payment_month' => 'required|numeric|in_list[1,2,3,4,5,6,7,8,9,10,11,12]',
             'payment_year' => 'required|numeric|min_length[4]|max_length[4]',
@@ -91,6 +94,47 @@ class Payment extends BaseController
 
         if (!$this->validate($rules)) {
             return redirect()->back()->withInput()->with('validation', $this->validator);
+        }
+
+        // Validate payment amount against member's dues
+        $amount = (float) $this->request->getPost('amount');
+
+        if ($monthlyDues > 0) {
+            // Minimum: 50% of monthly dues (allow partial payment)
+            $minAmount = $monthlyDues * 0.5;
+            // Maximum: 200% of monthly dues (allow double payment for arrears)
+            $maxAmount = $monthlyDues * 2;
+
+            if ($amount < $minAmount) {
+                return redirect()->back()->withInput()->with('error',
+                    sprintf('Jumlah pembayaran minimal adalah Rp %s (50%% dari iuran bulanan Rp %s)',
+                        number_format($minAmount, 0, ',', '.'),
+                        number_format($monthlyDues, 0, ',', '.')
+                    )
+                );
+            }
+
+            if ($amount > $maxAmount) {
+                return redirect()->back()->withInput()->with('error',
+                    sprintf('Jumlah pembayaran maksimal adalah Rp %s (200%% dari iuran bulanan Rp %s). Untuk pembayaran lebih besar, silakan hubungi bendahara.',
+                        number_format($maxAmount, 0, ',', '.'),
+                        number_format($monthlyDues, 0, ',', '.')
+                    )
+                );
+            }
+
+            // Warn if amount doesn't match exact dues
+            if ($amount != $monthlyDues) {
+                session()->setFlashdata('warning',
+                    sprintf('Iuran bulanan Anda adalah Rp %s. Anda membayar Rp %s.',
+                        number_format($monthlyDues, 0, ',', '.'),
+                        number_format($amount, 0, ',', '.')
+                    )
+                );
+            }
+        } else {
+            // No dues amount set - log warning and allow any amount
+            log_message('warning', "Member {$memberId} has no monthly_dues_amount set. Allowing payment of {$amount}");
         }
 
         $month = $this->request->getPost('payment_month');

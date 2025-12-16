@@ -124,6 +124,63 @@ class MemberManagement extends BaseController
             return redirect()->back()->with('error', 'Anggota tidak ditemukan');
         }
 
+        // Validate approval requirements
+        $validationErrors = [];
+
+        // 1. Check if email is verified
+        if (empty($member['email_verified_at'])) {
+            $validationErrors[] = 'Email belum diverifikasi';
+        }
+
+        // 2. Check if registration payment proof uploaded
+        if (empty($member['registration_payment_proof'])) {
+            $validationErrors[] = 'Bukti pembayaran pendaftaran belum diupload';
+        }
+
+        // 3. Check if required documents uploaded
+        if (empty($member['id_card_photo'])) {
+            $validationErrors[] = 'Foto KTP belum diupload';
+        }
+
+        // 4. Check if personal data completed
+        if (empty($member['birth_date']) || empty($member['address'])) {
+            $validationErrors[] = 'Data pribadi belum lengkap (tanggal lahir, alamat)';
+        }
+
+        // 5. Check if professional data completed
+        if (empty($member['faculty']) || empty($member['department'])) {
+            $validationErrors[] = 'Data pekerjaan belum lengkap (fakultas, departemen)';
+        }
+
+        // 6. Check onboarding state
+        if ($member['onboarding_state'] !== 'payment_submitted') {
+            $validationErrors[] = 'Status pendaftaran belum sesuai. Harus sudah submit pembayaran. Status saat ini: ' . $member['onboarding_state'];
+        }
+
+        // 7. Check current role
+        if ($member['role'] !== 'candidate') {
+            $validationErrors[] = 'Member ini bukan candidate (role: ' . $member['role'] . ')';
+        }
+
+        // 8. Check not already approved
+        if ($member['account_status'] === 'active' || $member['membership_status'] === 'active') {
+            $validationErrors[] = 'Member sudah diapprove sebelumnya';
+        }
+
+        // If validation fails, return errors
+        if (!empty($validationErrors)) {
+            $errorMessage = 'Tidak dapat menyetujui anggota. Persyaratan yang belum dipenuhi:<br>';
+            $errorMessage .= '<ul class="mb-0 ps-3">';
+            foreach ($validationErrors as $error) {
+                $errorMessage .= '<li>' . $error . '</li>';
+            }
+            $errorMessage .= '</ul>';
+
+            log_message('warning', "Approval blocked for member {$id}: " . implode(', ', $validationErrors));
+
+            return redirect()->back()->with('error', $errorMessage);
+        }
+
         // Generate member number
         helper('app');
         $memberNumber = generate_member_number($id, substr($member['province'], 0, 3));
@@ -140,6 +197,9 @@ class MemberManagement extends BaseController
         ];
 
         if ($this->memberModel->update($id, $updateData)) {
+            // Mark status changed to invalidate active sessions
+            $this->memberModel->markStatusChanged($id);
+
             // Send approval email
             $this->emailService->sendMembershipApproval(
                 $member['email'],
@@ -196,6 +256,9 @@ class MemberManagement extends BaseController
         ];
 
         if ($this->memberModel->update($id, $updateData)) {
+            // Mark status changed to invalidate active sessions
+            $this->memberModel->markStatusChanged($id);
+
             // Send rejection email
             $this->emailService->sendMembershipRejection(
                 $member['email'],
@@ -249,6 +312,9 @@ class MemberManagement extends BaseController
         ];
 
         if ($this->memberModel->update($id, $updateData)) {
+            // Mark status changed to invalidate active sessions
+            $this->memberModel->markStatusChanged($id);
+
             // Audit log
             helper('audit');
             audit_log_member_action(
@@ -288,6 +354,9 @@ class MemberManagement extends BaseController
         ];
 
         if ($this->memberModel->update($id, $updateData)) {
+            // Mark status changed to invalidate active sessions
+            $this->memberModel->markStatusChanged($id);
+
             log_message('info', "Member activated: ID {$id} by admin " . session()->get('user_id'));
             return redirect()->back()->with('success', 'Anggota berhasil diaktifkan kembali');
         } else {

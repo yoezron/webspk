@@ -25,6 +25,24 @@ class AuthFilter implements FilterInterface
             return redirect()->to(base_url('login'))->with('error', 'Silakan login terlebih dahulu');
         }
 
+        // Check if member data has changed since session was created (status, role, permissions)
+        $userId = session()->get('user_id');
+        $sessionCreatedAt = session()->get('session_created_at');
+
+        if ($userId && $sessionCreatedAt) {
+            $memberModel = new \App\Models\MemberModel();
+
+            // Check if status changed after session creation
+            if ($memberModel->hasStatusChangedSince($userId, $sessionCreatedAt)) {
+                // Status changed - invalidate session and force re-login
+                session()->destroy();
+
+                log_message('info', "Session invalidated for user {$userId} due to status change");
+
+                return redirect()->to(base_url('login'))->with('warning', 'Status akun Anda telah diubah. Silakan login kembali untuk memperbarui sesi Anda.');
+            }
+        }
+
         // Check if account is active
         if (session()->get('account_status') !== 'active') {
             // Allow candidates to access registration completion
