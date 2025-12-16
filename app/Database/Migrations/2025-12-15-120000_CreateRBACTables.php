@@ -45,7 +45,7 @@ class CreateRBACTables extends Migration
             ],
         ]);
         $this->forge->addKey('id', true);
-        $this->forge->addKey('role_slug');
+        // role_slug already has unique index from 'unique' => true definition
         $this->forge->createTable('rbac_roles', true);
 
         // 2. RBAC Permissions Table
@@ -90,7 +90,7 @@ class CreateRBACTables extends Migration
             ],
         ]);
         $this->forge->addKey('id', true);
-        $this->forge->addKey('permission_slug');
+        // permission_slug already has unique index from 'unique' => true definition
         $this->forge->addKey('permission_group');
         $this->forge->createTable('rbac_permissions', true);
 
