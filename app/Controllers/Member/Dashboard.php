@@ -63,18 +63,54 @@ class Dashboard extends BaseController
             ->where('status', 'pending')
             ->countAllResults();
 
+        // Prepare member info for Neptune theme
+        $memberInfoData = [
+            'name' => $member['full_name'] ?? 'N/A',
+            'member_number' => $memberInfo['member_number'],
+            'status' => $memberInfo['membership_status'],
+            'join_date' => $memberInfo['approval_date'] ?? $member['created_at'],
+            'email' => $member['email'] ?? 'N/A',
+        ];
+
+        // Prepare stats for Neptune theme
+        $statsData = [
+            'monthly_dues' => $memberInfo['monthly_dues'],
+            'total_paid' => $paymentStats['total_paid'],
+            'verified_payments' => $paymentStats['verified_count'],
+            'yearly_paid' => $paymentStats['this_year_paid'],
+        ];
+
+        // Prepare chart data for Neptune theme
+        $chartData = [
+            'months' => $paymentHistory['months'],
+            'payments' => $paymentHistory['amounts'],
+        ];
+
+        // Prepare recent payments list
+        $recentPaymentsList = [];
+        foreach ($recentPayments as $payment) {
+            $recentPaymentsList[] = [
+                'id' => $payment['id'],
+                'payment_date' => $payment['created_at'],
+                'month' => sprintf('%04d-%02d-01', $payment['payment_year'], $payment['payment_month']),
+                'amount' => $payment['amount'],
+                'payment_method' => $payment['payment_method'] ?? 'transfer',
+                'verification_status' => $payment['status'],
+            ];
+        }
+
         $data = [
             'title' => 'Dashboard Member',
             'description' => 'Dashboard Member Serikat Pekerja Kampus',
-            'member' => $member,
-            'member_info' => $memberInfo,
-            'payment_stats' => $paymentStats,
-            'recent_payments' => $recentPayments,
-            'payment_history' => $paymentHistory,
-            'pending_payments' => $pendingPayments,
+            'member_info' => $memberInfoData,
+            'stats' => $statsData,
+            'chart_data' => $chartData,
+            'recent_payments' => $recentPaymentsList,
+            'arrears' => $memberInfo['total_arrears'],
+            'pending_payments_count' => $pendingPayments,
         ];
 
-        return view('member/dashboard', $data);
+        return view('member/dashboard_neptune', $data);
     }
 
     /**
