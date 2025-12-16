@@ -10,11 +10,13 @@ class MemberManagement extends BaseController
 {
     protected $memberModel;
     protected $emailService;
+    protected $cache;
 
     public function __construct()
     {
         $this->memberModel = new MemberModel();
         $this->emailService = new EmailService();
+        $this->cache = \Config\Services::cache();
         helper(['app', 'form']);
     }
 
@@ -200,6 +202,9 @@ class MemberManagement extends BaseController
             // Mark status changed to invalidate active sessions
             $this->memberModel->markStatusChanged($id);
 
+            // Clear dashboard cache - member stats changed
+            $this->clearDashboardCache();
+
             // Send approval email
             $this->emailService->sendMembershipApproval(
                 $member['email'],
@@ -259,6 +264,9 @@ class MemberManagement extends BaseController
             // Mark status changed to invalidate active sessions
             $this->memberModel->markStatusChanged($id);
 
+            // Clear dashboard cache - member stats changed
+            $this->clearDashboardCache();
+
             // Send rejection email
             $this->emailService->sendMembershipRejection(
                 $member['email'],
@@ -315,6 +323,9 @@ class MemberManagement extends BaseController
             // Mark status changed to invalidate active sessions
             $this->memberModel->markStatusChanged($id);
 
+            // Clear dashboard cache - member stats changed
+            $this->clearDashboardCache();
+
             // Audit log
             helper('audit');
             audit_log_member_action(
@@ -357,6 +368,9 @@ class MemberManagement extends BaseController
             // Mark status changed to invalidate active sessions
             $this->memberModel->markStatusChanged($id);
 
+            // Clear dashboard cache - member stats changed
+            $this->clearDashboardCache();
+
             log_message('info', "Member activated: ID {$id} by admin " . session()->get('user_id'));
             return redirect()->back()->with('success', 'Anggota berhasil diaktifkan kembali');
         } else {
@@ -383,10 +397,33 @@ class MemberManagement extends BaseController
         // For now, we'll just delete
 
         if ($this->memberModel->delete($id)) {
+            // Clear dashboard cache - member stats changed
+            $this->clearDashboardCache();
+
             log_message('warning', "Member deleted: ID {$id} by admin " . session()->get('user_id'));
             return redirect()->to(base_url('admin/members'))->with('success', 'Anggota berhasil dihapus');
         } else {
             return redirect()->back()->with('error', 'Gagal menghapus anggota');
         }
+    }
+
+    /**
+     * Clear dashboard cache when member data changes
+     */
+    private function clearDashboardCache(): void
+    {
+        $cacheKeys = [
+            'admin_member_stats',
+            'admin_payment_stats',
+            'admin_monthly_stats',
+            'admin_member_growth_chart',
+            'admin_payment_trend_chart',
+        ];
+
+        foreach ($cacheKeys as $key) {
+            $this->cache->delete($key);
+        }
+
+        log_message('debug', 'Dashboard cache cleared after member data change');
     }
 }

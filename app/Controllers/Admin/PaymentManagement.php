@@ -12,12 +12,14 @@ class PaymentManagement extends BaseController
     protected $paymentModel;
     protected $memberModel;
     protected $emailService;
+    protected $cache;
 
     public function __construct()
     {
         $this->paymentModel = new DuesPaymentModel();
         $this->memberModel = new MemberModel();
         $this->emailService = new EmailService();
+        $this->cache = \Config\Services::cache();
         helper(['app', 'form']);
     }
 
@@ -116,6 +118,9 @@ class PaymentManagement extends BaseController
         ];
 
         if ($this->paymentModel->update($id, $updateData)) {
+            // Clear dashboard cache - payment stats changed
+            $this->clearDashboardCache();
+
             // Update member dues info
             $this->memberModel->update($payment['member_id'], [
                 'last_dues_payment_date' => $payment['payment_date'],
@@ -182,6 +187,9 @@ class PaymentManagement extends BaseController
         ];
 
         if ($this->paymentModel->update($id, $updateData)) {
+            // Clear dashboard cache - payment stats changed
+            $this->clearDashboardCache();
+
             // Audit log
             helper('audit');
             $member = $this->memberModel->find($payment['member_id']);
@@ -265,5 +273,25 @@ class PaymentManagement extends BaseController
         ];
 
         return view('admin/payments/view', $data);
+    }
+
+    /**
+     * Clear dashboard cache when payment data changes
+     */
+    private function clearDashboardCache(): void
+    {
+        $cacheKeys = [
+            'admin_member_stats',
+            'admin_payment_stats',
+            'admin_monthly_stats',
+            'admin_member_growth_chart',
+            'admin_payment_trend_chart',
+        ];
+
+        foreach ($cacheKeys as $key) {
+            $this->cache->delete($key);
+        }
+
+        log_message('debug', 'Dashboard cache cleared after payment data change');
     }
 }

@@ -20,6 +20,7 @@ class Dashboard extends BaseController
 
     /**
      * Member dashboard with enhanced statistics
+     * OPTIMIZED: Reduced from 20 queries to ~5 queries per page load
      */
     public function index()
     {
@@ -78,79 +79,69 @@ class Dashboard extends BaseController
 
     /**
      * Get payment statistics
+     * OPTIMIZED: 1 query instead of 5 separate queries
      */
     private function getPaymentStatistics(int $memberId): array
     {
         $db = \Config\Database::connect();
+        $currentYear = date('Y');
 
-        // Total payments
-        $totalPaid = $db->table('sp_dues_payments')
-            ->where('member_id', $memberId)
-            ->where('status', 'verified')
-            ->selectSum('amount')
-            ->get()
-            ->getRow()
-            ->amount ?? 0;
-
-        // Count verified payments
-        $verifiedCount = $db->table('sp_dues_payments')
-            ->where('member_id', $memberId)
-            ->where('status', 'verified')
-            ->countAllResults();
-
-        // Count pending payments
-        $pendingCount = $db->table('sp_dues_payments')
-            ->where('member_id', $memberId)
-            ->where('status', 'pending')
-            ->countAllResults();
-
-        // Count rejected payments
-        $rejectedCount = $db->table('sp_dues_payments')
-            ->where('member_id', $memberId)
-            ->where('status', 'rejected')
-            ->countAllResults();
-
-        // This year payments
-        $thisYearPaid = $db->table('sp_dues_payments')
-            ->where('member_id', $memberId)
-            ->where('status', 'verified')
-            ->where('payment_year', date('Y'))
-            ->selectSum('amount')
-            ->get()
-            ->getRow()
-            ->amount ?? 0;
+        // Single query with conditional aggregation
+        $result = $db->query("
+            SELECT
+                SUM(CASE WHEN status = 'verified' THEN amount ELSE 0 END) as total_paid,
+                SUM(CASE WHEN status = 'verified' THEN 1 ELSE 0 END) as verified_count,
+                SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending_count,
+                SUM(CASE WHEN status = 'rejected' THEN 1 ELSE 0 END) as rejected_count,
+                SUM(CASE WHEN status = 'verified' AND payment_year = ? THEN amount ELSE 0 END) as this_year_paid
+            FROM sp_dues_payments
+            WHERE member_id = ?
+        ", [$currentYear, $memberId])->getRow();
 
         return [
-            'total_paid' => $totalPaid,
-            'verified_count' => $verifiedCount,
-            'pending_count' => $pendingCount,
-            'rejected_count' => $rejectedCount,
-            'this_year_paid' => $thisYearPaid,
+            'total_paid' => $result->total_paid ?? 0,
+            'verified_count' => (int)$result->verified_count,
+            'pending_count' => (int)$result->pending_count,
+            'rejected_count' => (int)$result->rejected_count,
+            'this_year_paid' => $result->this_year_paid ?? 0,
         ];
     }
 
     /**
      * Get payment history for chart (last 12 months)
+     * OPTIMIZED: 1 query instead of 12 queries
      */
     private function getPaymentHistoryForChart(int $memberId): array
     {
+        $db = \Config\Database::connect();
+
+        // Get payment data for last 12 months in a single query
+        $paymentData = $db->query("
+            SELECT
+                CONCAT(payment_year, '-', LPAD(payment_month, 2, '0')) as month,
+                SUM(amount) as total_amount
+            FROM sp_dues_payments
+            WHERE member_id = ?
+                AND status = 'verified'
+                AND CONCAT(payment_year, '-', LPAD(payment_month, 2, '0')) >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 12 MONTH), '%Y-%m')
+            GROUP BY payment_year, payment_month
+            ORDER BY payment_year ASC, payment_month ASC
+        ", [$memberId])->getResultArray();
+
+        // Convert to associative array for easy lookup
+        $paymentsByMonth = [];
+        foreach ($paymentData as $row) {
+            $paymentsByMonth[$row['month']] = $row['total_amount'] ?? 0;
+        }
+
         $months = [];
         $amounts = [];
 
-        // Get last 12 months
+        // Build arrays for last 12 months
         for ($i = 11; $i >= 0; $i--) {
             $date = date('Y-m', strtotime("-$i months"));
-            list($year, $month) = explode('-', $date);
-
-            $payment = $this->paymentModel
-                ->where('member_id', $memberId)
-                ->where('payment_year', $year)
-                ->where('payment_month', (int)$month)
-                ->where('status', 'verified')
-                ->first();
-
             $months[] = date('M Y', strtotime($date . '-01'));
-            $amounts[] = $payment ? $payment['amount'] : 0;
+            $amounts[] = $paymentsByMonth[$date] ?? 0;
         }
 
         return [
