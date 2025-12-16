@@ -10,32 +10,35 @@ class Dashboard extends BaseController
 {
     protected $memberModel;
     protected $paymentModel;
+    protected $cache;
 
     public function __construct()
     {
         $this->memberModel = new MemberModel();
         $this->paymentModel = new DuesPaymentModel();
+        $this->cache = \Config\Services::cache();
         helper(['form', 'url', 'app']);
     }
 
     /**
      * Admin dashboard with enhanced statistics and charts
      * OPTIMIZED: Reduced from 59+ queries to ~10 queries per page load
+     * CACHED: Stats cached for 5 min, charts for 15 min
      */
     public function index()
     {
-        // Get member statistics (1 query instead of 4)
-        $stats = $this->getMemberStatistics();
+        // Get member statistics (cached 5 minutes)
+        $stats = $this->getCachedData('admin_member_stats', [$this, 'getMemberStatistics'], 300);
 
-        // Get payment statistics (1 query instead of 4)
-        $paymentStats = $this->getPaymentStatistics();
+        // Get payment statistics (cached 5 minutes)
+        $paymentStats = $this->getCachedData('admin_payment_stats', [$this, 'getPaymentStatistics'], 300);
 
-        // Get monthly statistics
-        $monthlyStats = $this->getMonthlyStatistics();
+        // Get monthly statistics (cached 5 minutes)
+        $monthlyStats = $this->getCachedData('admin_monthly_stats', [$this, 'getMonthlyStatistics'], 300);
 
-        // Get chart data
-        $memberGrowthChart = $this->getMemberGrowthChart();
-        $paymentTrendChart = $this->getPaymentTrendChart();
+        // Get chart data (cached 15 minutes - heavier queries)
+        $memberGrowthChart = $this->getCachedData('admin_member_growth_chart', [$this, 'getMemberGrowthChart'], 900);
+        $paymentTrendChart = $this->getCachedData('admin_payment_trend_chart', [$this, 'getPaymentTrendChart'], 900);
 
         // Get pending approvals list
         $pendingApprovals = $this->memberModel->getPendingApprovals(10);
@@ -69,6 +72,30 @@ class Dashboard extends BaseController
         ];
 
         return view('admin/dashboard', $data);
+    }
+
+    /**
+     * Get cached data or fetch and cache if not exists
+     *
+     * @param string $cacheKey Cache key
+     * @param callable $callback Function to call if cache miss
+     * @param int $ttl Time to live in seconds
+     * @return mixed Cached or fresh data
+     */
+    private function getCachedData(string $cacheKey, callable $callback, int $ttl)
+    {
+        $data = $this->cache->get($cacheKey);
+
+        if ($data === null) {
+            // Cache miss - fetch data and cache it
+            $data = call_user_func($callback);
+            $this->cache->save($cacheKey, $data, $ttl);
+            log_message('debug', "Cache MISS: {$cacheKey} - Data fetched and cached for {$ttl}s");
+        } else {
+            log_message('debug', "Cache HIT: {$cacheKey}");
+        }
+
+        return $data;
     }
 
     /**
