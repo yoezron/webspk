@@ -46,6 +46,11 @@ $routes->group('', ['namespace' => 'App\Controllers'], function($routes) {
     $routes->post('auth/reset-password', 'Auth::processResetPassword');
 });
 
+// Secure File Download - Require Authentication
+$routes->group('', ['filter' => 'auth', 'namespace' => 'App\Controllers'], function($routes) {
+    $routes->get('files/(:segment)/(:segment)', 'FileController::download/$1/$2');
+});
+
 // Protected Routes - Require Authentication
 $routes->group('', ['filter' => 'auth', 'namespace' => 'App\Controllers'], function($routes) {
     // General Dashboard (for all authenticated users)
