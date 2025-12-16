@@ -25,12 +25,14 @@ class MemberModel extends Model
         'last_login_at',
         'last_login_ip',
         'last_user_agent',
+        'last_status_change_at',
         'failed_login_attempts',
         'locked_until',
         'password_changed_at',
         'reset_token_hash',
         'reset_token_expires_at',
         'remember_token_hash',
+        'remember_token_expires_at',
         'full_name',
         'gender',
         'birth_place',
@@ -281,6 +283,89 @@ class MemberModel extends Model
             'reset_token_hash' => null,
             'reset_token_expires_at' => null,
         ]);
+    }
+
+    /**
+     * Generate and store remember token (for "Remember Me" functionality)
+     *
+     * @param int $memberId Member ID
+     * @return string Plain token to be stored in cookie
+     */
+    public function generateRememberToken(int $memberId): string
+    {
+        // Generate cryptographically secure random token
+        $token = bin2hex(random_bytes(32));
+        $hash = hash('sha256', $token);
+
+        // Store hashed token with 30 days expiry
+        $this->update($memberId, [
+            'remember_token_hash' => $hash,
+            'remember_token_expires_at' => date('Y-m-d H:i:s', strtotime('+30 days')),
+        ]);
+
+        return $token;
+    }
+
+    /**
+     * Find member by remember token
+     *
+     * @param string $token Plain token from cookie
+     * @return array|null Member data if token valid, null otherwise
+     */
+    public function findByRememberToken(string $token): ?array
+    {
+        $hash = hash('sha256', $token);
+
+        return $this->where('remember_token_hash', $hash)
+            ->where('remember_token_expires_at >', date('Y-m-d H:i:s'))
+            ->where('account_status', 'active') // Only active accounts
+            ->first();
+    }
+
+    /**
+     * Clear remember token (on logout)
+     *
+     * @param int $memberId Member ID
+     * @return bool Success status
+     */
+    public function clearRememberToken(int $memberId): bool
+    {
+        return $this->update($memberId, [
+            'remember_token_hash' => null,
+            'remember_token_expires_at' => null,
+        ]);
+    }
+
+    /**
+     * Mark status change timestamp
+     * This will invalidate active sessions for this member
+     *
+     * @param int $memberId Member ID
+     * @return bool Success status
+     */
+    public function markStatusChanged(int $memberId): bool
+    {
+        return $this->update($memberId, [
+            'last_status_change_at' => date('Y-m-d H:i:s'),
+        ]);
+    }
+
+    /**
+     * Check if member data changed after session was created
+     *
+     * @param int $memberId Member ID
+     * @param string $sessionCreatedAt Session creation timestamp
+     * @return bool True if data changed, false otherwise
+     */
+    public function hasStatusChangedSince(int $memberId, string $sessionCreatedAt): bool
+    {
+        $member = $this->find($memberId);
+
+        if (!$member || empty($member['last_status_change_at'])) {
+            return false;
+        }
+
+        return strtotime($member['last_status_change_at']) > strtotime($sessionCreatedAt);
     }
 
     /**

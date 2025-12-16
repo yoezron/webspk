@@ -42,8 +42,27 @@ $RECYCLE.BIN/
 # These should never be under version control,
 # as it poses a security risk.
 .env
+.env.*
+.env.local
+.env.development
+.env.staging
+.env.production
+.env.backup*
 .vagrant
 Vagrantfile
+
+#-------------------------
+# Security & Credentials
+#-------------------------
+# Never commit these files!
+*.pem
+*.key
+*.cert
+*.crt
+*credentials*
+*secret*
+.aws/
+.ssh/
 
 #-------------------------
 # Temporary Files
