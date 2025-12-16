@@ -169,11 +169,42 @@ class Payment extends BaseController
             'notes' => $this->request->getPost('notes'),
         ];
 
-        if ($this->paymentModel->insert($paymentData)) {
-            log_message('info', "Payment submitted by member {$memberId} for period {$month}/{$year}");
-            return redirect()->to(base_url('member/payment'))->with('success', 'Pembayaran berhasil disubmit. Menunggu verifikasi admin.');
-        } else {
-            return redirect()->back()->withInput()->with('error', 'Gagal menyimpan data pembayaran');
+        try {
+            // Attempt to insert payment
+            if ($this->paymentModel->insert($paymentData)) {
+                log_message('info', "Payment submitted by member {$memberId} for period {$month}/{$year}");
+                return redirect()->to(base_url('member/payment'))->with('success', 'Pembayaran berhasil disubmit. Menunggu verifikasi admin.');
+            } else {
+                // Delete uploaded file if insert failed
+                $uploadPath = FCPATH . 'uploads/payments/' . $uploadResult['file_name'];
+                if (file_exists($uploadPath)) {
+                    unlink($uploadPath);
+                }
+
+                return redirect()->back()->withInput()->with('error', 'Gagal menyimpan data pembayaran');
+            }
+        } catch (\Exception $e) {
+            // Delete uploaded file since insert failed
+            $uploadPath = FCPATH . 'uploads/payments/' . $uploadResult['file_name'];
+            if (file_exists($uploadPath)) {
+                unlink($uploadPath);
+            }
+
+            // Check if this is a duplicate key constraint violation
+            $errorMessage = $e->getMessage();
+            if (strpos($errorMessage, 'unique_payment_period') !== false ||
+                strpos($errorMessage, 'Duplicate entry') !== false) {
+
+                // Race condition detected - log for monitoring
+                log_message('warning', "Race condition detected: Duplicate payment attempt by member {$memberId} for period {$month}/{$year}. Error: {$errorMessage}");
+
+                return redirect()->back()->withInput()->with('error',
+                    'Pembayaran untuk periode ini sudah ada. Kemungkinan terjadi pengiriman ganda. Silakan cek riwayat pembayaran Anda.');
+            }
+
+            // Other database errors
+            log_message('error', "Payment insert failed for member {$memberId}: {$errorMessage}");
+            return redirect()->back()->withInput()->with('error', 'Terjadi kesalahan saat menyimpan pembayaran. Silakan coba lagi.');
         }
     }
 

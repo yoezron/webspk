@@ -75,7 +75,7 @@ class EmailVerification extends BaseController
     }
 
     /**
-     * Resend verification email
+     * Resend verification email with rate limiting
      */
     public function resend()
     {
@@ -89,11 +89,19 @@ class EmailVerification extends BaseController
             return redirect()->back()->with('error', 'Email harus diisi');
         }
 
+        // SECURITY: Rate limiting to prevent email bombing
+        $rateLimitCheck = $this->checkRateLimit($email);
+        if (!$rateLimitCheck['allowed']) {
+            return redirect()->back()->with('error', $rateLimitCheck['message']);
+        }
+
         // Find member
         $member = $this->memberModel->findByEmail($email);
 
         if (!$member) {
             // Don't reveal if email exists or not for security
+            // But still apply rate limiting
+            $this->recordResendAttempt($email);
             return redirect()->back()->with('success', 'Jika email terdaftar, link verifikasi baru telah dikirim.');
         }
 
@@ -116,10 +124,105 @@ class EmailVerification extends BaseController
 
         // Send email
         if ($this->emailService->sendEmailVerification($member['email'], $member['full_name'], $token)) {
+            // Record successful resend for rate limiting
+            $this->recordResendAttempt($email);
+
             return redirect()->back()->with('success', 'Link verifikasi baru telah dikirim ke email Anda.');
         } else {
             log_message('error', 'Failed to resend verification email to: ' . $member['email']);
             return redirect()->back()->with('error', 'Gagal mengirim email verifikasi. Silakan coba lagi.');
         }
+    }
+
+    /**
+     * Check rate limit for email resend
+     *
+     * @param string $email Email address
+     * @return array ['allowed' => bool, 'message' => string]
+     */
+    private function checkRateLimit(string $email): array
+    {
+        $result = ['allowed' => true, 'message' => ''];
+
+        // Get rate limit data from session
+        $rateLimitKey = 'email_resend_' . md5($email);
+        $rateLimitData = session()->get($rateLimitKey);
+
+        if (!$rateLimitData) {
+            // First attempt - allowed
+            return $result;
+        }
+
+        $now = time();
+        $lastResend = $rateLimitData['last_resend'] ?? 0;
+        $resendCount = $rateLimitData['count'] ?? 0;
+        $windowStart = $rateLimitData['window_start'] ?? $now;
+
+        // Rule 1: Minimum 60 seconds between resends
+        $timeSinceLastResend = $now - $lastResend;
+        if ($timeSinceLastResend < 60) {
+            $waitTime = 60 - $timeSinceLastResend;
+            $result['allowed'] = false;
+            $result['message'] = "Mohon tunggu {$waitTime} detik sebelum mengirim ulang email verifikasi.";
+            return $result;
+        }
+
+        // Rule 2: Maximum 3 resends per 1 hour window
+        $windowDuration = $now - $windowStart;
+        if ($windowDuration < 3600) {
+            // Still within 1-hour window
+            if ($resendCount >= 3) {
+                $remainingTime = ceil((3600 - $windowDuration) / 60);
+                $result['allowed'] = false;
+                $result['message'] = "Anda telah mencapai batas maksimum pengiriman ulang email (3x per jam). Silakan coba lagi dalam {$remainingTime} menit.";
+                return $result;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Record email resend attempt for rate limiting
+     *
+     * @param string $email Email address
+     * @return void
+     */
+    private function recordResendAttempt(string $email): void
+    {
+        $rateLimitKey = 'email_resend_' . md5($email);
+        $rateLimitData = session()->get($rateLimitKey);
+
+        $now = time();
+
+        if (!$rateLimitData) {
+            // First attempt
+            $rateLimitData = [
+                'last_resend' => $now,
+                'count' => 1,
+                'window_start' => $now,
+            ];
+        } else {
+            $windowStart = $rateLimitData['window_start'] ?? $now;
+            $windowDuration = $now - $windowStart;
+
+            if ($windowDuration >= 3600) {
+                // Window expired - start new window
+                $rateLimitData = [
+                    'last_resend' => $now,
+                    'count' => 1,
+                    'window_start' => $now,
+                ];
+            } else {
+                // Within window - increment count
+                $rateLimitData['last_resend'] = $now;
+                $rateLimitData['count'] = ($rateLimitData['count'] ?? 0) + 1;
+            }
+        }
+
+        session()->set($rateLimitKey, $rateLimitData);
+
+        // Log for security monitoring
+        log_message('info', "Email resend attempt: {$email}, Count: {$rateLimitData['count']}, IP: " . $this->request->getIPAddress());
     }
 }
