@@ -79,9 +79,16 @@
 
             <li class="sidebar-title">Pengaturan</li>
 
-            <li>
-                <a href="<?= base_url('settings') ?>"><i class="material-icons-two-tone">settings</i>Pengaturan</a>
-            </li>
+            <?php if (is_super_admin()): ?>
+                <li>
+                    <a href="#"><i class="material-icons-two-tone">admin_panel_settings</i>Super Admin<i class="material-icons has-sub-menu">keyboard_arrow_right</i></a>
+                    <ul class="sub-menu">
+                        <li><a href="<?= base_url('admin/settings') ?>">System Settings</a></li>
+                        <li><a href="<?= base_url('admin/settings/rbac') ?>">RBAC Management</a></li>
+                        <li><a href="<?= base_url('admin/settings/audit') ?>">Audit Log</a></li>
+                    </ul>
+                </li>
+            <?php endif; ?>
 
             <li>
                 <a href="<?= base_url('auth/logout') ?>" onclick="return confirm('Apakah Anda yakin ingin keluar?')">

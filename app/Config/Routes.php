@@ -79,6 +79,36 @@ $routes->group('admin', ['filter' => 'rbac:super_admin,admin', 'namespace' => 'A
     $routes->post('payments/reject/(:num)', 'PaymentManagement::reject/$1');
 });
 
+// Super Admin Only Routes - Settings, RBAC, Audit
+$routes->group('admin/settings', ['filter' => 'rbac:super_admin', 'namespace' => 'App\Controllers\Admin'], function($routes) {
+    // System Settings
+    $routes->get('/', 'Settings::index');
+    $routes->post('update', 'Settings::update');
+    $routes->get('create', 'Settings::create');
+    $routes->post('create', 'Settings::create');
+    $routes->post('delete/(:num)', 'Settings::delete/$1');
+    $routes->post('reset/(:num)', 'Settings::reset/$1');
+
+    // RBAC Management
+    $routes->get('rbac', 'RBACManagement::index');
+    $routes->get('rbac/roles', 'RBACManagement::roles');
+    $routes->get('rbac/permissions', 'RBACManagement::permissions');
+    $routes->get('rbac/assign', 'RBACManagement::assignRoles');
+    $routes->post('rbac/update-user-roles', 'RBACManagement::updateUserRoles');
+    $routes->get('rbac/role/(:num)/permissions', 'RBACManagement::editRolePermissions/$1');
+    $routes->post('rbac/role/(:num)/permissions', 'RBACManagement::editRolePermissions/$1');
+    $routes->get('rbac/role/create', 'RBACManagement::createRole');
+    $routes->post('rbac/role/create', 'RBACManagement::createRole');
+    $routes->post('rbac/role/(:num)/toggle', 'RBACManagement::toggleRoleStatus/$1');
+
+    // Audit Log
+    $routes->get('audit', 'AuditLog::index');
+    $routes->get('audit/view/(:num)', 'AuditLog::view/$1');
+    $routes->get('audit/export', 'AuditLog::export');
+    $routes->post('audit/clean', 'AuditLog::clean');
+    $routes->get('audit/statistics', 'AuditLog::statistics');
+});
+
 // Member Routes - Require member, coordinator, or treasurer role
 $routes->group('member', ['filter' => 'rbac:member,coordinator,treasurer', 'namespace' => 'App\Controllers\Member'], function($routes) {
     $routes->get('dashboard', 'Dashboard::index');
