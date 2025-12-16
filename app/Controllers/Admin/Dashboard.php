@@ -60,20 +60,65 @@ class Dashboard extends BaseController
             ->limit(5)
             ->findAll();
 
+        // Prepare stats data for Neptune theme
+        $statsData = array_merge($stats, [
+            'total_collected' => $paymentStats['total_collected'],
+            'pending_verification' => $paymentStats['pending_count'],
+            'monthly_collection' => $paymentStats['this_month'],
+            'yearly_collection' => $paymentStats['this_year'],
+        ]);
+
+        // Prepare chart data for Neptune theme
+        $chartData = [
+            'member_growth' => [
+                'months' => $memberGrowthChart['months'],
+                'total' => $memberGrowthChart['total_members'],
+                'new' => $memberGrowthChart['new_members'],
+            ],
+            'payment_trend' => [
+                'months' => $paymentTrendChart['months'],
+                'amounts' => $paymentTrendChart['amounts'],
+                'counts' => $paymentTrendChart['counts'],
+            ],
+        ];
+
+        // Prepare pending payments for Neptune table
+        $pendingPaymentsList = [];
+        foreach ($pendingPayments as $payment) {
+            $pendingPaymentsList[] = [
+                'member_name' => $payment['full_name'] ?? 'N/A',
+                'month' => date('F Y', mktime(0, 0, 0, $payment['payment_month'], 1, $payment['payment_year'])),
+                'amount' => $payment['amount'],
+                'id' => $payment['id'],
+            ];
+        }
+
+        // Prepare recent registrations
+        $recentRegList = [];
+        foreach ($recentRegistrations as $member) {
+            $recentRegList[] = [
+                'name' => $member['full_name'] ?? 'N/A',
+                'email' => $member['email'] ?? 'N/A',
+                'created_at' => $member['created_at'],
+                'id' => $member['id'],
+            ];
+        }
+
         $data = [
             'title' => 'Dashboard Admin',
             'description' => 'Dashboard Admin Serikat Pekerja Kampus',
-            'stats' => $stats,
-            'payment_stats' => $paymentStats,
-            'monthly_stats' => $monthlyStats,
-            'member_growth_chart' => $memberGrowthChart,
-            'payment_trend_chart' => $paymentTrendChart,
-            'pending_approvals' => $pendingApprovals,
-            'recent_registrations' => $recentRegistrations,
-            'pending_payments' => $pendingPayments,
+            'stats' => $statsData,
+            'monthly_stats' => [
+                'new_registrations' => $monthlyStats['new_registrations'],
+                'approvals' => $monthlyStats['approved'],
+                'payments' => $monthlyStats['payments'],
+            ],
+            'chart_data' => $chartData,
+            'pending_payments' => $pendingPaymentsList,
+            'recent_registrations' => $recentRegList,
         ];
 
-        return view('admin/dashboard', $data);
+        return view('admin/dashboard_neptune', $data);
     }
 
     /**
