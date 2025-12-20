@@ -122,6 +122,12 @@ $routes->group('admin/dues-rates', ['filter' => 'rbac:super_admin,admin', 'names
     $routes->get('duplicate/(:num)', 'DuesRateController::duplicate/$1');
 });
 
+// Admin Routes - Comprehensive Reports
+$routes->group('admin/reports', ['filter' => 'rbac:super_admin,admin', 'namespace' => 'App\Controllers\Admin'], function($routes) {
+    $routes->get('/', 'ReportsController::index');
+    $routes->get('export', 'ReportsController::export');
+});
+
 // Coordinator Routes - Regional management
 $routes->group('coordinator', ['filter' => 'rbac:coordinator', 'namespace' => 'App\Controllers\Coordinator'], function($routes) {
     $routes->get('dashboard', 'Dashboard::index');
