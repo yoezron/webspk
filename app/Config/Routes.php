@@ -109,6 +109,19 @@ $routes->group('admin/settings', ['filter' => 'rbac:super_admin', 'namespace' =>
     $routes->get('audit/statistics', 'AuditLog::statistics');
 });
 
+// Admin Routes - Dues Rate Management
+$routes->group('admin/dues-rates', ['filter' => 'rbac:super_admin,admin', 'namespace' => 'App\Controllers\Admin'], function($routes) {
+    $routes->get('/', 'DuesRateController::index');
+    $routes->get('create', 'DuesRateController::create');
+    $routes->post('create', 'DuesRateController::create');
+    $routes->get('edit/(:num)', 'DuesRateController::edit/$1');
+    $routes->post('edit/(:num)', 'DuesRateController::edit/$1');
+    $routes->get('view/(:num)', 'DuesRateController::view/$1');
+    $routes->post('toggle-status', 'DuesRateController::toggleStatus');
+    $routes->post('delete/(:num)', 'DuesRateController::delete/$1');
+    $routes->get('duplicate/(:num)', 'DuesRateController::duplicate/$1');
+});
+
 // Coordinator Routes - Regional management
 $routes->group('coordinator', ['filter' => 'rbac:coordinator', 'namespace' => 'App\Controllers\Coordinator'], function($routes) {
     $routes->get('dashboard', 'Dashboard::index');
