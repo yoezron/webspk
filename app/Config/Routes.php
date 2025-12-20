@@ -162,7 +162,17 @@ $routes->group('admin/coordinators', ['filter' => 'rbac:super_admin,admin', 'nam
 // Member Routes - Require member, coordinator, or treasurer role
 $routes->group('member', ['filter' => 'rbac:member,coordinator,treasurer', 'namespace' => 'App\Controllers\Member'], function($routes) {
     $routes->get('dashboard', 'Dashboard::index');
-    $routes->get('profile', 'Profile::index');
+
+    // Profile Management
+    $routes->get('profile', 'ProfileController::index');
+    $routes->get('profile/edit', 'ProfileController::edit');
+    $routes->post('profile/edit', 'ProfileController::edit');
+    $routes->get('profile/employment', 'ProfileController::employment');
+    $routes->post('profile/employment', 'ProfileController::employment');
+    $routes->get('profile/change-password', 'ProfileController::changePassword');
+    $routes->post('profile/change-password', 'ProfileController::changePassword');
+    $routes->post('profile/upload-photo', 'ProfileController::uploadPhoto');
+    $routes->post('profile/delete-photo', 'ProfileController::deletePhoto');
 
     // Payment/Dues
     $routes->get('payment', 'Payment::index');
