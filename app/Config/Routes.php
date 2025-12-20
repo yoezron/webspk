@@ -109,6 +109,31 @@ $routes->group('admin/settings', ['filter' => 'rbac:super_admin', 'namespace' =>
     $routes->get('audit/statistics', 'AuditLog::statistics');
 });
 
+// Coordinator Routes - Regional management
+$routes->group('coordinator', ['filter' => 'rbac:coordinator', 'namespace' => 'App\Controllers\Coordinator'], function($routes) {
+    $routes->get('dashboard', 'Dashboard::index');
+
+    // Member Management
+    $routes->get('members', 'MemberController::index');
+    $routes->get('members/pending', 'MemberController::pending');
+    $routes->get('members/view/(:num)', 'MemberController::view/$1');
+    $routes->post('members/approve/(:num)', 'MemberController::approve/$1');
+    $routes->post('members/reject/(:num)', 'MemberController::reject/$1');
+
+    // Regional Reports
+    $routes->get('reports', 'ReportsController::index');
+    $routes->get('reports/export', 'ReportsController::export');
+});
+
+// Admin Routes - Coordinator Management
+$routes->group('admin/coordinators', ['filter' => 'rbac:super_admin,admin', 'namespace' => 'App\Controllers\Admin'], function($routes) {
+    $routes->get('/', 'CoordinatorManagement::index');
+    $routes->get('assign/(:num)', 'CoordinatorManagement::assign/$1');
+    $routes->post('assign/(:num)', 'CoordinatorManagement::assign/$1');
+    $routes->post('unassign', 'CoordinatorManagement::unassign');
+    $routes->get('stats', 'CoordinatorManagement::regionalStats');
+});
+
 // Member Routes - Require member, coordinator, or treasurer role
 $routes->group('member', ['filter' => 'rbac:member,coordinator,treasurer', 'namespace' => 'App\Controllers\Member'], function($routes) {
     $routes->get('dashboard', 'Dashboard::index');
