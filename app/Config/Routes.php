@@ -119,6 +119,10 @@ $routes->group('coordinator', ['filter' => 'rbac:coordinator', 'namespace' => 'A
     $routes->get('members/view/(:num)', 'MemberController::view/$1');
     $routes->post('members/approve/(:num)', 'MemberController::approve/$1');
     $routes->post('members/reject/(:num)', 'MemberController::reject/$1');
+
+    // Regional Reports
+    $routes->get('reports', 'ReportsController::index');
+    $routes->get('reports/export', 'ReportsController::export');
 });
 
 // Admin Routes - Coordinator Management
