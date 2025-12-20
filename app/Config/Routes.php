@@ -128,6 +128,12 @@ $routes->group('admin/reports', ['filter' => 'rbac:super_admin,admin', 'namespac
     $routes->get('export', 'ReportsController::export');
 });
 
+// Admin Routes - Enhanced Analytics
+$routes->group('admin/analytics', ['filter' => 'rbac:super_admin,admin', 'namespace' => 'App\Controllers\Admin'], function($routes) {
+    $routes->get('/', 'AnalyticsController::index');
+    $routes->get('kpi-api', 'AnalyticsController::kpiApi');
+});
+
 // Coordinator Routes - Regional management
 $routes->group('coordinator', ['filter' => 'rbac:coordinator', 'namespace' => 'App\Controllers\Coordinator'], function($routes) {
     $routes->get('dashboard', 'Dashboard::index');

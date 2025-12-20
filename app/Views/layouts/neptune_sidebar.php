@@ -65,6 +65,10 @@
                 </li>
 
                 <li>
+                    <a href="<?= base_url('admin/analytics') ?>"><i class="material-icons-two-tone">analytics</i>Analytics</a>
+                </li>
+
+                <li>
                     <a href="<?= base_url('admin/reports') ?>"><i class="material-icons-two-tone">assessment</i>Laporan</a>
                 </li>
 
