@@ -61,6 +61,10 @@
                 </li>
 
                 <li>
+                    <a href="<?= base_url('admin/dues-rates') ?>"><i class="material-icons-two-tone">attach_money</i>Tarif Iuran</a>
+                </li>
+
+                <li>
                     <a href="<?= base_url('admin/reports') ?>"><i class="material-icons-two-tone">assessment</i>Laporan</a>
                 </li>
 
