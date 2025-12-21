@@ -80,11 +80,11 @@ class AuditLog extends BaseController
 
         // Get recent active users for filter
         $recentUsers = $this->db->table('audit_logs')
-            ->distinct()
-            ->select('audit_logs.user_id, sp_members.full_name')
+            ->select('audit_logs.user_id, sp_members.full_name, MAX(audit_logs.created_at) as last_activity')
             ->join('sp_members', 'sp_members.id = audit_logs.user_id', 'left')
             ->where('audit_logs.created_at >=', date('Y-m-d', strtotime('-30 days')))
-            ->orderBy('audit_logs.created_at', 'DESC')
+            ->groupBy('audit_logs.user_id, sp_members.full_name')
+            ->orderBy('last_activity', 'DESC')
             ->limit(50)
             ->get()
             ->getResultArray();
