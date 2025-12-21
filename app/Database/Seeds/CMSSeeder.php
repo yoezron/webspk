@@ -158,39 +158,37 @@ class CMSSeeder extends Seeder
     {
         $sections = [
             [
-                'section_type' => 'hero',
+                'section_key' => 'hero',
                 'title' => 'Selamat Datang di Serikat Pekerja Kampus',
-                'subtitle' => 'Bersama Memperjuangkan Hak dan Kesejahteraan Pekerja Kampus',
-                'content_html' => '<p>Bergabunglah dengan kami untuk mewujudkan kesejahteraan pekerja kampus yang lebih baik.</p>',
-                'settings_json' => json_encode([
+                'body_html' => '<p>Bergabunglah dengan kami untuk mewujudkan kesejahteraan pekerja kampus yang lebih baik.</p>',
+                'config_json' => json_encode([
+                    'subtitle' => 'Bersama Memperjuangkan Hak dan Kesejahteraan Pekerja Kampus',
                     'button_text' => 'Daftar Sekarang',
                     'button_link' => '/register',
                     'show_stats' => true,
                 ]),
                 'sort_order' => 1,
-                'is_active' => 1,
-                'created_at' => date('Y-m-d H:i:s'),
+                'is_enabled' => 1,
             ],
             [
-                'section_type' => 'stats',
+                'section_key' => 'stats',
                 'title' => 'Statistik SPK',
-                'subtitle' => 'Data Keanggotaan dan Aktivitas',
-                'content_html' => null,
-                'settings_json' => json_encode([
+                'body_html' => null,
+                'config_json' => json_encode([
+                    'subtitle' => 'Data Keanggotaan dan Aktivitas',
                     'show_members' => true,
                     'show_regions' => true,
                     'show_events' => true,
                 ]),
                 'sort_order' => 2,
-                'is_active' => 1,
-                'created_at' => date('Y-m-d H:i:s'),
+                'is_enabled' => 1,
             ],
             [
-                'section_type' => 'features',
+                'section_key' => 'features',
                 'title' => 'Keunggulan Menjadi Anggota',
-                'subtitle' => 'Berbagai manfaat yang Anda dapatkan',
-                'content_html' => '<ul><li>Perlindungan hukum</li><li>Advokasi kesejahteraan</li><li>Networking dan pengembangan karir</li></ul>',
-                'settings_json' => json_encode([
+                'body_html' => '<ul><li>Perlindungan hukum</li><li>Advokasi kesejahteraan</li><li>Networking dan pengembangan karir</li></ul>',
+                'config_json' => json_encode([
+                    'subtitle' => 'Berbagai manfaat yang Anda dapatkan',
                     'features' => [
                         ['icon' => 'fa-shield', 'title' => 'Perlindungan Hukum', 'desc' => 'Bantuan hukum untuk anggota'],
                         ['icon' => 'fa-heart', 'title' => 'Kesejahteraan', 'desc' => 'Program kesejahteraan anggota'],
@@ -198,43 +196,39 @@ class CMSSeeder extends Seeder
                     ]
                 ]),
                 'sort_order' => 3,
-                'is_active' => 1,
-                'created_at' => date('Y-m-d H:i:s'),
+                'is_enabled' => 1,
             ],
             [
-                'section_type' => 'news',
+                'section_key' => 'news',
                 'title' => 'Berita Terbaru',
-                'subtitle' => 'Update terkini dari SPK',
-                'content_html' => null,
-                'settings_json' => json_encode([
+                'body_html' => null,
+                'config_json' => json_encode([
+                    'subtitle' => 'Update terkini dari SPK',
                     'limit' => 3,
                     'show_excerpt' => true,
                 ]),
                 'sort_order' => 4,
-                'is_active' => 1,
-                'created_at' => date('Y-m-d H:i:s'),
+                'is_enabled' => 1,
             ],
             [
-                'section_type' => 'cta',
+                'section_key' => 'cta',
                 'title' => 'Bergabung dengan Kami',
-                'subtitle' => 'Daftarkan diri Anda sebagai anggota SPK',
-                'content_html' => '<p>Bersama kita lebih kuat. Mari berjuang bersama untuk kesejahteraan pekerja kampus.</p>',
-                'settings_json' => json_encode([
+                'body_html' => '<p>Bersama kita lebih kuat. Mari berjuang bersama untuk kesejahteraan pekerja kampus.</p>',
+                'config_json' => json_encode([
+                    'subtitle' => 'Daftarkan diri Anda sebagai anggota SPK',
                     'button_text' => 'Daftar Sekarang',
                     'button_link' => '/register',
                     'button_style' => 'primary',
                 ]),
                 'sort_order' => 5,
-                'is_active' => 1,
-                'created_at' => date('Y-m-d H:i:s'),
+                'is_enabled' => 1,
             ],
         ];
 
         $builder = $this->db->table('cms_home_sections');
 
         foreach ($sections as $section) {
-            $existing = $builder->where('section_type', $section['section_type'])
-                               ->where('sort_order', $section['sort_order'])
+            $existing = $builder->where('section_key', $section['section_key'])
                                ->get()->getRowArray();
 
             if (!$existing) {
