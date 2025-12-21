@@ -36,7 +36,7 @@ if (!function_exists('update_setting')) {
     function update_setting(string $key, $value, ?int $userId = null): bool
     {
         $model = new SystemSettingsModel();
-        return $model->set($key, $value, $userId);
+        return $model->setSetting($key, $value, $userId);
     }
 }
 
