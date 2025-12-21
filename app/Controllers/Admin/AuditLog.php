@@ -10,12 +10,14 @@ class AuditLog extends BaseController
 {
     protected $auditModel;
     protected $memberModel;
+    protected $db;
 
     public function __construct()
     {
         $this->auditModel = new AuditLogModel();
         $this->memberModel = new MemberModel();
-        helper(['form', 'url']);
+        $this->db = \Config\Database::connect();
+        helper(['form', 'url', 'settings']);
     }
 
     /**
