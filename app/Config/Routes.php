@@ -110,6 +110,8 @@ $routes->group('admin', ['filter' => 'rbac:super_admin,admin', 'namespace' => 'A
     // Payment Management
     $routes->get('payments', 'PaymentManagement::index');
     $routes->get('payments/pending', 'PaymentManagement::pendingVerifications');
+    $routes->get('payments/verified', 'PaymentManagement::verifiedPayments');
+    $routes->get('payments/rejected', 'PaymentManagement::rejectedPayments');
     $routes->get('payments/view/(:num)', 'PaymentManagement::view/$1');
     $routes->post('payments/verify/(:num)', 'PaymentManagement::verify/$1');
     $routes->post('payments/reject/(:num)', 'PaymentManagement::reject/$1');
