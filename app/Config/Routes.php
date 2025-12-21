@@ -107,6 +107,15 @@ $routes->group('admin', ['filter' => 'rbac:super_admin,admin', 'namespace' => 'A
     $routes->post('members/activate/(:num)', 'MemberManagement::activate/$1');
     $routes->post('members/delete/(:num)', 'MemberManagement::delete/$1');
 
+    // Bulk Member Import
+    $routes->get('members/bulk-import', 'BulkMemberImport::index');
+    $routes->post('members/bulk-import/upload', 'BulkMemberImport::upload');
+    $routes->get('members/bulk-import/preview', 'BulkMemberImport::preview');
+    $routes->post('members/bulk-import/process', 'BulkMemberImport::process');
+    $routes->get('members/bulk-import/result', 'BulkMemberImport::result');
+    $routes->get('members/bulk-import/cancel', 'BulkMemberImport::cancel');
+    $routes->get('members/bulk-import/download-template', 'BulkMemberImport::downloadTemplate');
+
     // Payment Management
     $routes->get('payments', 'PaymentManagement::index');
     $routes->get('payments/pending', 'PaymentManagement::pendingVerifications');

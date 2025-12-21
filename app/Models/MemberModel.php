@@ -99,6 +99,8 @@ class MemberModel extends Model
         'agreement_accepted_at',
         'privacy_accepted_at',
         'notes',
+        'is_migrated',
+        'migrated_at',
     ];
 
     // Dates

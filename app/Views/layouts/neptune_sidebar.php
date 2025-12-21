@@ -40,6 +40,7 @@
                         <li><a href="<?= base_url('admin/members') ?>">Daftar Anggota</a></li>
                         <li><a href="<?= base_url('admin/members/pending') ?>">Persetujuan Anggota</a></li>
                         <li><a href="<?= base_url('admin/members/suspended') ?>">Anggota Ditangguhkan</a></li>
+                        <li><a href="<?= base_url('admin/members/bulk-import') ?>">Import Data Anggota</a></li>
                     </ul>
                 </li>
 
