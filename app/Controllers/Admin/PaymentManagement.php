@@ -89,6 +89,56 @@ class PaymentManagement extends BaseController
     }
 
     /**
+     * Verified payments list
+     */
+    public function verifiedPayments()
+    {
+        $perPage = getenv('app.perPage') ?: 20;
+
+        $payments = $this->paymentModel
+            ->select('sp_dues_payments.*, sp_members.full_name, sp_members.member_number, sp_members.email')
+            ->join('sp_members', 'sp_members.id = sp_dues_payments.member_id')
+            ->where('sp_dues_payments.status', 'verified')
+            ->orderBy('sp_dues_payments.verified_at', 'DESC')
+            ->paginate($perPage);
+
+        $pager = $this->paymentModel->pager;
+
+        $data = [
+            'title' => 'Pembayaran Terverifikasi',
+            'payments' => $payments,
+            'pager' => $pager,
+        ];
+
+        return view('admin/payments/verified', $data);
+    }
+
+    /**
+     * Rejected payments list
+     */
+    public function rejectedPayments()
+    {
+        $perPage = getenv('app.perPage') ?: 20;
+
+        $payments = $this->paymentModel
+            ->select('sp_dues_payments.*, sp_members.full_name, sp_members.member_number, sp_members.email')
+            ->join('sp_members', 'sp_members.id = sp_dues_payments.member_id')
+            ->where('sp_dues_payments.status', 'rejected')
+            ->orderBy('sp_dues_payments.verified_at', 'DESC')
+            ->paginate($perPage);
+
+        $pager = $this->paymentModel->pager;
+
+        $data = [
+            'title' => 'Pembayaran Ditolak',
+            'payments' => $payments,
+            'pager' => $pager,
+        ];
+
+        return view('admin/payments/rejected', $data);
+    }
+
+    /**
      * Verify payment
      */
     public function verify($id)
