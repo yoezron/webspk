@@ -8,17 +8,20 @@ class AddProfilePhotoColumn extends Migration
 {
     public function up()
     {
-        $fields = [
-            'profile_photo' => [
-                'type' => 'VARCHAR',
-                'constraint' => 255,
-                'null' => true,
-                'after' => 'gender',
-                'comment' => 'Profile photo filename',
-            ],
-        ];
+        // Check if column already exists
+        if (!$this->db->fieldExists('profile_photo', 'sp_members')) {
+            $fields = [
+                'profile_photo' => [
+                    'type' => 'VARCHAR',
+                    'constraint' => 255,
+                    'null' => true,
+                    'after' => 'gender',
+                    'comment' => 'Profile photo filename',
+                ],
+            ];
 
-        $this->forge->addColumn('sp_members', $fields);
+            $this->forge->addColumn('sp_members', $fields);
+        }
     }
 
     public function down()
