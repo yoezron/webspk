@@ -99,6 +99,7 @@ $routes->group('admin', ['filter' => 'rbac:super_admin,admin', 'namespace' => 'A
     // Member Management
     $routes->get('members', 'MemberManagement::index');
     $routes->get('members/pending', 'MemberManagement::pendingApprovals');
+    $routes->get('members/suspended', 'MemberManagement::suspendedMembers');
     $routes->get('members/view/(:num)', 'MemberManagement::view/$1');
     $routes->post('members/approve/(:num)', 'MemberManagement::approve/$1');
     $routes->post('members/reject/(:num)', 'MemberManagement::reject/$1');
