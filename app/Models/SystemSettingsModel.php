@@ -70,7 +70,7 @@ class SystemSettingsModel extends Model
      * @param int|null $userId
      * @return bool
      */
-    public function set(string $key, $value, ?int $userId = null): bool
+    public function setSetting(string $key, $value, ?int $userId = null): bool
     {
         $setting = $this->where('setting_key', $key)->first();
 

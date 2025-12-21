@@ -81,7 +81,7 @@ class Settings extends BaseController
             $oldValue = $setting['setting_value'];
 
             // Update setting
-            if ($this->settingsModel->set($key, $value, session()->get('user_id'))) {
+            if ($this->settingsModel->setSetting($key, $value, session()->get('user_id'))) {
                 $updated[] = $key;
 
                 // Log the change
@@ -265,7 +265,7 @@ class Settings extends BaseController
 
         $oldValue = $setting['setting_value'];
 
-        if ($this->settingsModel->set($key, $defaultValue, session()->get('user_id'))) {
+        if ($this->settingsModel->setSetting($key, $defaultValue, session()->get('user_id'))) {
             // Log the reset
             $this->auditModel->log(
                 'update',
