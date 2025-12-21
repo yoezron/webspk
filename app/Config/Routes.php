@@ -8,6 +8,41 @@ use CodeIgniter\Router\RouteCollection;
 // Public Routes
 $routes->get('/', 'Home::index');
 
+// Public CMS Routes - News
+$routes->group('berita', ['namespace' => 'App\Controllers\Public'], function($routes) {
+    $routes->get('/', 'NewsController::index');
+    $routes->get('arsip/(:num)', 'NewsController::archive/$1');
+    $routes->get('(:segment)', 'NewsController::show/$1');
+});
+
+// Public CMS Routes - Documents
+$routes->group('', ['namespace' => 'App\Controllers\Public'], function($routes) {
+    $routes->get('publikasi', 'DocumentController::publikasi');
+    $routes->get('regulasi', 'DocumentController::regulasi');
+    $routes->get('documents/download/(:num)', 'DocumentController::download/$1');
+    $routes->get('documents/preview/(:num)', 'DocumentController::preview/$1');
+    $routes->get('documents/search', 'DocumentController::search');
+});
+
+// Public CMS Routes - Contact
+$routes->group('contact', ['namespace' => 'App\Controllers\Public'], function($routes) {
+    $routes->get('/', 'ContactController::index');
+    $routes->post('submit', 'ContactController::submit');
+    $routes->post('ajax-submit', 'ContactController::ajaxSubmit');
+});
+
+// Public CMS Routes - Static Pages
+$routes->group('', ['namespace' => 'App\Controllers\Public'], function($routes) {
+    $routes->get('tentang', 'PageController::tentang');
+    $routes->get('sejarah', 'PageController::sejarah');
+    $routes->get('manifesto', 'PageController::manifesto');
+    $routes->get('visi-misi', 'PageController::visimisi');
+    $routes->get('ad-art', 'PageController::adart');
+    $routes->get('pengurus', 'PageController::pengurus');
+    $routes->get('kontak', 'PageController::kontak');
+    $routes->get('page/(:segment)', 'PageController::show/$1');
+});
+
 // Registration Routes (Public - Multi-step)
 $routes->group('registrasi', ['namespace' => 'App\Controllers'], function($routes) {
     $routes->get('/', 'Register::index');
@@ -120,6 +155,100 @@ $routes->group('admin/dues-rates', ['filter' => 'rbac:super_admin,admin', 'names
     $routes->post('toggle-status', 'DuesRateController::toggleStatus');
     $routes->post('delete/(:num)', 'DuesRateController::delete/$1');
     $routes->get('duplicate/(:num)', 'DuesRateController::duplicate/$1');
+});
+
+// Admin CMS Routes - Pages Management
+$routes->group('admin/cms/pages', ['filter' => 'rbac:super_admin,admin', 'namespace' => 'App\Controllers\Admin\CMS'], function($routes) {
+    $routes->get('/', 'PageController::index');
+    $routes->get('create', 'PageController::create');
+    $routes->post('create', 'PageController::create');
+    $routes->get('edit/(:num)', 'PageController::edit/$1');
+    $routes->post('edit/(:num)', 'PageController::edit/$1');
+    $routes->get('revisions/(:num)', 'PageController::revisions/$1');
+    $routes->post('restore-revision/(:num)', 'PageController::restoreRevision/$1');
+    $routes->post('delete/(:num)', 'PageController::delete/$1');
+});
+
+// Admin CMS Routes - News Management
+$routes->group('admin/cms/news', ['filter' => 'rbac:super_admin,admin', 'namespace' => 'App\Controllers\Admin\CMS'], function($routes) {
+    $routes->get('/', 'NewsController::index');
+    $routes->get('create', 'NewsController::create');
+    $routes->post('create', 'NewsController::create');
+    $routes->get('edit/(:num)', 'NewsController::edit/$1');
+    $routes->post('edit/(:num)', 'NewsController::edit/$1');
+    $routes->post('delete/(:num)', 'NewsController::delete/$1');
+});
+
+// Admin CMS Routes - Documents Management
+$routes->group('admin/cms/documents', ['filter' => 'rbac:super_admin,admin', 'namespace' => 'App\Controllers\Admin\CMS'], function($routes) {
+    $routes->get('/', 'DocumentController::index');
+    $routes->get('create', 'DocumentController::create');
+    $routes->post('create', 'DocumentController::create');
+    $routes->get('edit/(:num)', 'DocumentController::edit/$1');
+    $routes->post('edit/(:num)', 'DocumentController::edit/$1');
+    $routes->post('delete/(:num)', 'DocumentController::delete/$1');
+    $routes->get('categories', 'DocumentController::categories');
+    $routes->post('categories', 'DocumentController::categories');
+});
+
+// Admin CMS Routes - Officers Management
+$routes->group('admin/cms/officers', ['filter' => 'rbac:super_admin,admin', 'namespace' => 'App\Controllers\Admin\CMS'], function($routes) {
+    $routes->get('/', 'OfficerController::index');
+    $routes->get('create', 'OfficerController::create');
+    $routes->post('create', 'OfficerController::create');
+    $routes->get('edit/(:num)', 'OfficerController::edit/$1');
+    $routes->post('edit/(:num)', 'OfficerController::edit/$1');
+    $routes->post('delete/(:num)', 'OfficerController::delete/$1');
+    $routes->post('toggle-active/(:num)', 'OfficerController::toggleActive/$1');
+});
+
+// Admin CMS Routes - Landing Page Management (Super Admin Only)
+$routes->group('admin/cms/landing', ['filter' => 'rbac:super_admin', 'namespace' => 'App\Controllers\Admin\CMS'], function($routes) {
+    $routes->get('/', 'LandingController::index');
+    $routes->get('create', 'LandingController::create');
+    $routes->post('create', 'LandingController::create');
+    $routes->get('edit/(:num)', 'LandingController::edit/$1');
+    $routes->post('edit/(:num)', 'LandingController::edit/$1');
+    $routes->post('delete/(:num)', 'LandingController::delete/$1');
+    $routes->post('toggle-active/(:num)', 'LandingController::toggleActive/$1');
+    $routes->post('reorder', 'LandingController::reorder');
+});
+
+// Admin CMS Routes - Media Library
+$routes->group('admin/cms/media', ['filter' => 'rbac:super_admin,admin', 'namespace' => 'App\Controllers\Admin\CMS'], function($routes) {
+    $routes->get('/', 'MediaController::index');
+    $routes->get('upload', 'MediaController::upload');
+    $routes->post('upload', 'MediaController::upload');
+    $routes->post('ajax-upload', 'MediaController::ajaxUpload');
+    $routes->get('edit/(:num)', 'MediaController::edit/$1');
+    $routes->post('edit/(:num)', 'MediaController::edit/$1');
+    $routes->post('delete/(:num)', 'MediaController::delete/$1');
+    $routes->get('get-url/(:num)', 'MediaController::getUrl/$1');
+});
+
+// Admin CMS Routes - Subscribers Management
+$routes->group('admin/cms/subscribers', ['filter' => 'rbac:super_admin,admin', 'namespace' => 'App\Controllers\Admin\CMS'], function($routes) {
+    $routes->get('/', 'SubscriberController::index');
+    $routes->get('create', 'SubscriberController::create');
+    $routes->post('create', 'SubscriberController::create');
+    $routes->get('edit/(:num)', 'SubscriberController::edit/$1');
+    $routes->post('edit/(:num)', 'SubscriberController::edit/$1');
+    $routes->post('delete/(:num)', 'SubscriberController::delete/$1');
+    $routes->get('export', 'SubscriberController::export');
+    $routes->post('bulk-delete', 'SubscriberController::bulkDelete');
+});
+
+// Admin CMS Routes - Contact Messages Management
+$routes->group('admin/cms/contact', ['filter' => 'rbac:super_admin,admin', 'namespace' => 'App\Controllers\Admin\CMS'], function($routes) {
+    $routes->get('/', 'ContactController::index');
+    $routes->get('view/(:num)', 'ContactController::view/$1');
+    $routes->post('assign/(:num)', 'ContactController::assign/$1');
+    $routes->post('mark-replied/(:num)', 'ContactController::markReplied/$1');
+    $routes->post('add-note/(:num)', 'ContactController::addNote/$1');
+    $routes->post('archive/(:num)', 'ContactController::archive/$1');
+    $routes->post('delete/(:num)', 'ContactController::delete/$1');
+    $routes->post('bulk-archive', 'ContactController::bulkArchive');
+    $routes->get('export', 'ContactController::export');
 });
 
 // Admin Routes - Comprehensive Reports
