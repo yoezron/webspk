@@ -112,6 +112,30 @@ class MemberManagement extends BaseController
     }
 
     /**
+     * Suspended members list
+     */
+    public function suspendedMembers()
+    {
+        $perPage = getenv('app.perPage') ?: 20;
+
+        // Get suspended members
+        $members = $this->memberModel
+            ->where('account_status', 'suspended')
+            ->orderBy('updated_at', 'DESC')
+            ->paginate($perPage);
+
+        $pager = $this->memberModel->pager;
+
+        $data = [
+            'title' => 'Anggota Ditangguhkan',
+            'members' => $members,
+            'pager' => $pager,
+        ];
+
+        return view('admin/members/suspended', $data);
+    }
+
+    /**
      * Approve member
      */
     public function approve($id)
