@@ -88,6 +88,7 @@ class CreateSystemSettingsTable extends Migration
                 'category' => 'general',
                 'description' => 'Nama aplikasi yang ditampilkan',
                 'is_public' => 1,
+                'validation_rules' => null,
             ],
             [
                 'setting_key' => 'app_logo',
@@ -96,6 +97,7 @@ class CreateSystemSettingsTable extends Migration
                 'category' => 'general',
                 'description' => 'Path logo aplikasi',
                 'is_public' => 1,
+                'validation_rules' => null,
             ],
             [
                 'setting_key' => 'maintenance_mode',
@@ -104,6 +106,7 @@ class CreateSystemSettingsTable extends Migration
                 'category' => 'system',
                 'description' => 'Aktifkan mode maintenance',
                 'is_public' => 0,
+                'validation_rules' => null,
             ],
             [
                 'setting_key' => 'member_registration_open',
@@ -112,6 +115,7 @@ class CreateSystemSettingsTable extends Migration
                 'category' => 'general',
                 'description' => 'Buka pendaftaran anggota baru',
                 'is_public' => 1,
+                'validation_rules' => null,
             ],
 
             // Dues Settings
@@ -169,6 +173,7 @@ class CreateSystemSettingsTable extends Migration
                 'category' => 'email',
                 'description' => 'Nama pengirim email',
                 'is_public' => 0,
+                'validation_rules' => null,
             ],
             [
                 'setting_key' => 'email_notifications_enabled',
@@ -177,6 +182,7 @@ class CreateSystemSettingsTable extends Migration
                 'category' => 'email',
                 'description' => 'Aktifkan notifikasi email',
                 'is_public' => 0,
+                'validation_rules' => null,
             ],
 
             // Notification Settings
@@ -187,6 +193,7 @@ class CreateSystemSettingsTable extends Migration
                 'category' => 'notification',
                 'description' => 'Notifikasi saat anggota disetujui',
                 'is_public' => 0,
+                'validation_rules' => null,
             ],
             [
                 'setting_key' => 'notify_payment_verified',
@@ -195,6 +202,7 @@ class CreateSystemSettingsTable extends Migration
                 'category' => 'notification',
                 'description' => 'Notifikasi saat pembayaran diverifikasi',
                 'is_public' => 0,
+                'validation_rules' => null,
             ],
             [
                 'setting_key' => 'notify_arrears_warning',
@@ -203,6 +211,7 @@ class CreateSystemSettingsTable extends Migration
                 'category' => 'notification',
                 'description' => 'Peringatan tunggakan otomatis',
                 'is_public' => 0,
+                'validation_rules' => null,
             ],
 
             // Security Settings
