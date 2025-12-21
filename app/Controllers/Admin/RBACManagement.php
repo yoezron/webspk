@@ -14,6 +14,7 @@ class RBACManagement extends BaseController
     protected $permissionModel;
     protected $memberModel;
     protected $auditModel;
+    protected $db;
 
     public function __construct()
     {
@@ -21,6 +22,7 @@ class RBACManagement extends BaseController
         $this->permissionModel = new RBACPermissionModel();
         $this->memberModel = new MemberModel();
         $this->auditModel = new AuditLogModel();
+        $this->db = \Config\Database::connect();
         helper(['form', 'url', 'rbac']);
     }
 
