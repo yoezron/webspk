@@ -158,83 +158,103 @@ class CMSSeeder extends Seeder
     {
         $sections = [
             [
-                'section_type' => 'hero',
-                'title' => 'Selamat Datang di Serikat Pekerja Kampus',
-                'subtitle' => 'Bersama Memperjuangkan Hak dan Kesejahteraan Pekerja Kampus',
-                'content_html' => '<p>Bergabunglah dengan kami untuk mewujudkan kesejahteraan pekerja kampus yang lebih baik.</p>',
-                'settings_json' => json_encode([
-                    'button_text' => 'Daftar Sekarang',
-                    'button_link' => '/register',
-                    'show_stats' => true,
-                ]),
+                'section_key' => 'about',
+                'title' => 'Tentang Serikat Pekerja Kampus',
+                'body_html' => '<p>Serikat Pekerja Kampus (SPK) memperjuangkan hak dan kesejahteraan pekerja kampus di seluruh Indonesia.</p>',
+                'config_json' => null,
                 'sort_order' => 1,
-                'is_active' => 1,
-                'created_at' => date('Y-m-d H:i:s'),
+                'is_enabled' => 1,
             ],
             [
-                'section_type' => 'stats',
-                'title' => 'Statistik SPK',
-                'subtitle' => 'Data Keanggotaan dan Aktivitas',
-                'content_html' => null,
-                'settings_json' => json_encode([
-                    'show_members' => true,
-                    'show_regions' => true,
-                    'show_events' => true,
+                'section_key' => 'stats',
+                'title' => 'Statistik Anggota',
+                'body_html' => null,
+                'config_json' => json_encode([
+                    'mode' => 'dynamic',
+                    'cache_minutes' => 60,
+                    'show_gender' => true,
+                    'show_province' => true,
                 ]),
                 'sort_order' => 2,
-                'is_active' => 1,
-                'created_at' => date('Y-m-d H:i:s'),
+                'is_enabled' => 1,
             ],
             [
-                'section_type' => 'features',
-                'title' => 'Keunggulan Menjadi Anggota',
-                'subtitle' => 'Berbagai manfaat yang Anda dapatkan',
-                'content_html' => '<ul><li>Perlindungan hukum</li><li>Advokasi kesejahteraan</li><li>Networking dan pengembangan karir</li></ul>',
-                'settings_json' => json_encode([
-                    'features' => [
-                        ['icon' => 'fa-shield', 'title' => 'Perlindungan Hukum', 'desc' => 'Bantuan hukum untuk anggota'],
-                        ['icon' => 'fa-heart', 'title' => 'Kesejahteraan', 'desc' => 'Program kesejahteraan anggota'],
-                        ['icon' => 'fa-users', 'title' => 'Networking', 'desc' => 'Jaringan profesional luas'],
-                    ]
+                'section_key' => 'latest_publications',
+                'title' => 'Publikasi Terkini',
+                'body_html' => null,
+                'config_json' => json_encode([
+                    'source' => 'cms_documents',
+                    'type' => 'publikasi',
+                    'limit' => 6,
                 ]),
                 'sort_order' => 3,
-                'is_active' => 1,
-                'created_at' => date('Y-m-d H:i:s'),
+                'is_enabled' => 1,
             ],
             [
-                'section_type' => 'news',
-                'title' => 'Berita Terbaru',
-                'subtitle' => 'Update terkini dari SPK',
-                'content_html' => null,
-                'settings_json' => json_encode([
-                    'limit' => 3,
-                    'show_excerpt' => true,
+                'section_key' => 'cta_join',
+                'title' => 'Bergabung',
+                'body_html' => null,
+                'config_json' => json_encode([
+                    'button_text' => 'Bergabung Sekarang',
+                    'url' => '/register',
                 ]),
                 'sort_order' => 4,
-                'is_active' => 1,
-                'created_at' => date('Y-m-d H:i:s'),
+                'is_enabled' => 1,
             ],
             [
-                'section_type' => 'cta',
-                'title' => 'Bergabung dengan Kami',
-                'subtitle' => 'Daftarkan diri Anda sebagai anggota SPK',
-                'content_html' => '<p>Bersama kita lebih kuat. Mari berjuang bersama untuk kesejahteraan pekerja kampus.</p>',
-                'settings_json' => json_encode([
-                    'button_text' => 'Daftar Sekarang',
-                    'button_link' => '/register',
-                    'button_style' => 'primary',
+                'section_key' => 'cta_login',
+                'title' => 'Login',
+                'body_html' => null,
+                'config_json' => json_encode([
+                    'button_text' => 'Login',
+                    'url' => '/login',
                 ]),
                 'sort_order' => 5,
-                'is_active' => 1,
-                'created_at' => date('Y-m-d H:i:s'),
+                'is_enabled' => 1,
+            ],
+            [
+                'section_key' => 'officers',
+                'title' => 'Pengurus SPK',
+                'body_html' => null,
+                'config_json' => json_encode([
+                    'level' => 'pusat',
+                    'limit' => 10,
+                ]),
+                'sort_order' => 6,
+                'is_enabled' => 1,
+            ],
+            [
+                'section_key' => 'subscribe',
+                'title' => 'Subscribe Newsletter',
+                'body_html' => null,
+                'config_json' => json_encode([
+                    'double_opt_in' => true,
+                ]),
+                'sort_order' => 7,
+                'is_enabled' => 1,
+            ],
+            [
+                'section_key' => 'footer',
+                'title' => 'Footer',
+                'body_html' => null,
+                'config_json' => json_encode([
+                    'address' => 'Alamat SPK',
+                    'email' => 'info@spk.id',
+                    'phone' => '08xx',
+                    'socials' => [
+                        ['label' => 'Instagram', 'url' => 'https://instagram.com/spk'],
+                        ['label' => 'Twitter', 'url' => 'https://twitter.com/spk'],
+                    ],
+                ]),
+                'sort_order' => 8,
+                'is_enabled' => 1,
             ],
         ];
 
         $builder = $this->db->table('cms_home_sections');
 
         foreach ($sections as $section) {
-            $existing = $builder->where('section_type', $section['section_type'])
-                               ->where('sort_order', $section['sort_order'])
+            $existing = $builder->where('section_key', $section['section_key'])
                                ->get()->getRowArray();
 
             if (!$existing) {
