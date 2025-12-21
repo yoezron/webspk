@@ -12,12 +12,14 @@ class ReportsController extends BaseController
     protected $memberModel;
     protected $regionModel;
     protected $duesRateModel;
+    protected $db;
 
     public function __construct()
     {
         $this->memberModel = new MemberModel();
         $this->regionModel = new RegionCodeModel();
         $this->duesRateModel = new DuesRateModel();
+        $this->db = \Config\Database::connect();
         helper(['form', 'url', 'rbac']);
     }
 
