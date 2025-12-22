@@ -124,6 +124,15 @@ $routes->group('admin', ['filter' => 'rbac:super_admin,admin', 'namespace' => 'A
     $routes->get('payments/view/(:num)', 'PaymentManagement::view/$1');
     $routes->post('payments/verify/(:num)', 'PaymentManagement::verify/$1');
     $routes->post('payments/reject/(:num)', 'PaymentManagement::reject/$1');
+
+    // Profile Management (Admin)
+    $routes->get('profile', 'ProfileController::index');
+    $routes->get('profile/edit', 'ProfileController::edit');
+    $routes->post('profile/edit', 'ProfileController::edit');
+    $routes->get('profile/change-password', 'ProfileController::changePassword');
+    $routes->post('profile/change-password', 'ProfileController::changePassword');
+    $routes->post('profile/upload-photo', 'ProfileController::uploadPhoto');
+    $routes->post('profile/delete-photo', 'ProfileController::deletePhoto');
 });
 
 // Super Admin Only Routes - Settings, RBAC, Audit
@@ -289,6 +298,15 @@ $routes->group('coordinator', ['filter' => 'rbac:coordinator', 'namespace' => 'A
     // Regional Reports
     $routes->get('reports', 'ReportsController::index');
     $routes->get('reports/export', 'ReportsController::export');
+
+    // Profile Management (Coordinator)
+    $routes->get('profile', 'ProfileController::index', ['namespace' => 'App\Controllers\Admin']);
+    $routes->get('profile/edit', 'ProfileController::edit', ['namespace' => 'App\Controllers\Admin']);
+    $routes->post('profile/edit', 'ProfileController::edit', ['namespace' => 'App\Controllers\Admin']);
+    $routes->get('profile/change-password', 'ProfileController::changePassword', ['namespace' => 'App\Controllers\Admin']);
+    $routes->post('profile/change-password', 'ProfileController::changePassword', ['namespace' => 'App\Controllers\Admin']);
+    $routes->post('profile/upload-photo', 'ProfileController::uploadPhoto', ['namespace' => 'App\Controllers\Admin']);
+    $routes->post('profile/delete-photo', 'ProfileController::deletePhoto', ['namespace' => 'App\Controllers\Admin']);
 });
 
 // Admin Routes - Coordinator Management

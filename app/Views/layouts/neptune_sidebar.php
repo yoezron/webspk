@@ -66,11 +66,31 @@
                 </li>
 
                 <li>
+                    <a href="#"><i class="material-icons-two-tone">web</i>Content Management<i class="material-icons has-sub-menu">keyboard_arrow_right</i></a>
+                    <ul class="sub-menu">
+                        <li><a href="<?= base_url('admin/cms/news') ?>">Berita</a></li>
+                        <li><a href="<?= base_url('admin/cms/documents') ?>">Dokumen</a></li>
+                        <li><a href="<?= base_url('admin/cms/pages') ?>">Halaman</a></li>
+                        <li><a href="<?= base_url('admin/cms/officers') ?>">Pengurus</a></li>
+                        <?php if (is_super_admin()): ?>
+                        <li><a href="<?= base_url('admin/cms/landing') ?>">Landing Page</a></li>
+                        <?php endif; ?>
+                        <li><a href="<?= base_url('admin/cms/media') ?>">Media Library</a></li>
+                        <li><a href="<?= base_url('admin/cms/subscribers') ?>">Subscriber</a></li>
+                        <li><a href="<?= base_url('admin/cms/contact') ?>">Pesan Kontak</a></li>
+                    </ul>
+                </li>
+
+                <li>
                     <a href="<?= base_url('admin/analytics') ?>"><i class="material-icons-two-tone">analytics</i>Analytics</a>
                 </li>
 
                 <li>
                     <a href="<?= base_url('admin/reports') ?>"><i class="material-icons-two-tone">assessment</i>Laporan</a>
+                </li>
+
+                <li>
+                    <a href="<?= base_url('admin/profile') ?>"><i class="material-icons-two-tone">account_circle</i>Profil Saya</a>
                 </li>
 
             <?php elseif (has_role(['coordinator'])): ?>
@@ -99,6 +119,10 @@
 
                 <li>
                     <a href="<?= base_url('coordinator/reports') ?>"><i class="material-icons-two-tone">assessment</i>Laporan Regional</a>
+                </li>
+
+                <li>
+                    <a href="<?= base_url('coordinator/profile') ?>"><i class="material-icons-two-tone">account_circle</i>Profil Saya</a>
                 </li>
 
             <?php else: ?>
