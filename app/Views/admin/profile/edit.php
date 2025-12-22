@@ -71,21 +71,21 @@
                         <label for="gender" class="form-label">Jenis Kelamin <span class="text-danger">*</span></label>
                         <select class="form-select" id="gender" name="gender" required>
                             <option value="">- Pilih -</option>
-                            <option value="male" <?= old('gender', $member['gender'] ?? '') == 'male' ? 'selected' : '' ?>>Laki-laki</option>
-                            <option value="female" <?= old('gender', $member['gender'] ?? '') == 'female' ? 'selected' : '' ?>>Perempuan</option>
+                            <option value="L" <?= old('gender', $member['gender'] ?? '') == 'L' ? 'selected' : '' ?>>Laki-laki</option>
+                            <option value="P" <?= old('gender', $member['gender'] ?? '') == 'P' ? 'selected' : '' ?>>Perempuan</option>
                         </select>
                     </div>
 
                     <div class="col-md-6 mb-3">
-                        <label for="date_of_birth" class="form-label">Tanggal Lahir</label>
-                        <input type="date" class="form-control" id="date_of_birth" name="date_of_birth"
-                               value="<?= old('date_of_birth', $member['date_of_birth'] ?? '') ?>">
+                        <label for="birth_date" class="form-label">Tanggal Lahir</label>
+                        <input type="date" class="form-control" id="birth_date" name="birth_date"
+                               value="<?= old('birth_date', $member['birth_date'] ?? '') ?>">
                     </div>
 
                     <div class="col-md-6 mb-3">
-                        <label for="place_of_birth" class="form-label">Tempat Lahir</label>
-                        <input type="text" class="form-control" id="place_of_birth" name="place_of_birth"
-                               value="<?= old('place_of_birth', $member['place_of_birth'] ?? '') ?>"
+                        <label for="birth_place" class="form-label">Tempat Lahir</label>
+                        <input type="text" class="form-control" id="birth_place" name="birth_place"
+                               value="<?= old('birth_place', $member['birth_place'] ?? '') ?>"
                                placeholder="Contoh: Jakarta">
                     </div>
 

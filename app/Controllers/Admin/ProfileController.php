@@ -59,9 +59,9 @@ class ProfileController extends BaseController
                 'full_name' => 'required|min_length[3]|max_length[100]',
                 'phone_number' => 'permit_empty|min_length[10]|max_length[15]',
                 'address' => 'permit_empty|max_length[255]',
-                'date_of_birth' => 'permit_empty|valid_date',
-                'place_of_birth' => 'permit_empty|max_length[100]',
-                'gender' => 'required|in_list[male,female]',
+                'birth_date' => 'permit_empty|valid_date',
+                'birth_place' => 'permit_empty|max_length[100]',
+                'gender' => 'required|in_list[L,P]',
             ];
 
             if (!$this->validate($rules)) {
@@ -74,8 +74,8 @@ class ProfileController extends BaseController
                 'full_name',
                 'phone_number',
                 'address',
-                'date_of_birth',
-                'place_of_birth',
+                'birth_date',
+                'birth_place',
                 'gender',
             ]);
 
@@ -301,8 +301,8 @@ class ProfileController extends BaseController
             'email' => 'Email',
             'phone_number' => 'Nomor Telepon',
             'address' => 'Alamat',
-            'date_of_birth' => 'Tanggal Lahir',
-            'place_of_birth' => 'Tempat Lahir',
+            'birth_date' => 'Tanggal Lahir',
+            'birth_place' => 'Tempat Lahir',
             'gender' => 'Jenis Kelamin',
             'profile_photo' => 'Foto Profil',
         ];
