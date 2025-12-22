@@ -36,6 +36,7 @@ class Filters extends BaseFilters
         'performance'   => PerformanceMetrics::class,
         'auth'          => \App\Filters\AuthFilter::class,
         'rbac'          => \App\Filters\RBACFilter::class,
+        'profile_complete' => \App\Filters\ProfileCompletenessFilter::class,
     ];
 
     /**
