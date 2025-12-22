@@ -63,7 +63,7 @@
                     <div class="col-md-6 mb-3">
                         <label for="phone_number" class="form-label">Nomor Telepon</label>
                         <input type="tel" class="form-control" id="phone_number" name="phone_number"
-                               value="<?= old('phone_number', $member['phone_number']) ?>"
+                               value="<?= old('phone_number', $member['phone_number'] ?? '') ?>"
                                placeholder="08xxxxxxxxxx">
                     </div>
 
@@ -71,28 +71,28 @@
                         <label for="gender" class="form-label">Jenis Kelamin <span class="text-danger">*</span></label>
                         <select class="form-select" id="gender" name="gender" required>
                             <option value="">- Pilih -</option>
-                            <option value="male" <?= old('gender', $member['gender']) == 'male' ? 'selected' : '' ?>>Laki-laki</option>
-                            <option value="female" <?= old('gender', $member['gender']) == 'female' ? 'selected' : '' ?>>Perempuan</option>
+                            <option value="male" <?= old('gender', $member['gender'] ?? '') == 'male' ? 'selected' : '' ?>>Laki-laki</option>
+                            <option value="female" <?= old('gender', $member['gender'] ?? '') == 'female' ? 'selected' : '' ?>>Perempuan</option>
                         </select>
                     </div>
 
                     <div class="col-md-6 mb-3">
                         <label for="date_of_birth" class="form-label">Tanggal Lahir</label>
                         <input type="date" class="form-control" id="date_of_birth" name="date_of_birth"
-                               value="<?= old('date_of_birth', $member['date_of_birth']) ?>">
+                               value="<?= old('date_of_birth', $member['date_of_birth'] ?? '') ?>">
                     </div>
 
                     <div class="col-md-6 mb-3">
                         <label for="place_of_birth" class="form-label">Tempat Lahir</label>
                         <input type="text" class="form-control" id="place_of_birth" name="place_of_birth"
-                               value="<?= old('place_of_birth', $member['place_of_birth']) ?>"
+                               value="<?= old('place_of_birth', $member['place_of_birth'] ?? '') ?>"
                                placeholder="Contoh: Jakarta">
                     </div>
 
                     <div class="col-md-12 mb-3">
                         <label for="address" class="form-label">Alamat Lengkap</label>
                         <textarea class="form-control" id="address" name="address" rows="3"
-                                  placeholder="Jl. Nama Jalan No. XX, Kelurahan, Kecamatan, Kota"><?= old('address', $member['address']) ?></textarea>
+                                  placeholder="Jl. Nama Jalan No. XX, Kelurahan, Kecamatan, Kota"><?= old('address', $member['address'] ?? '') ?></textarea>
                     </div>
                 </div>
             </div>
