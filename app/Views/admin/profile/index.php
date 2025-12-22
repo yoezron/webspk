@@ -203,7 +203,7 @@
                                 <th>Tempat, Tanggal Lahir</th>
                                 <td>
                                     <?= esc($member['place_of_birth'] ?? '-') ?>,
-                                    <?= $member['date_of_birth'] ? date('d F Y', strtotime($member['date_of_birth'])) : '-' ?>
+                                    <?= !empty($member['date_of_birth']) ? date('d F Y', strtotime($member['date_of_birth'])) : '-' ?>
                                 </td>
                             </tr>
                             <tr>
