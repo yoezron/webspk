@@ -193,7 +193,7 @@
                                 <th>Jenis Kelamin</th>
                                 <td>
                                     <?php if (!empty($member['gender'])): ?>
-                                        <?= $member['gender'] === 'male' ? 'Laki-laki' : 'Perempuan' ?>
+                                        <?= $member['gender'] === 'L' ? 'Laki-laki' : 'Perempuan' ?>
                                     <?php else: ?>
                                         -
                                     <?php endif; ?>
@@ -202,8 +202,8 @@
                             <tr>
                                 <th>Tempat, Tanggal Lahir</th>
                                 <td>
-                                    <?= esc($member['place_of_birth'] ?? '-') ?>,
-                                    <?= !empty($member['date_of_birth']) ? date('d F Y', strtotime($member['date_of_birth'])) : '-' ?>
+                                    <?= esc($member['birth_place'] ?? '-') ?>,
+                                    <?= !empty($member['birth_date']) ? date('d F Y', strtotime($member['birth_date'])) : '-' ?>
                                 </td>
                             </tr>
                             <tr>
